@@ -18,25 +18,25 @@ No comma between operands.
 
 Instructions and registers must be lowercase.
 
-Hexadecimal numbers must be uppercase.
+Hexadecimal numbers must be uppercase and appear in pairs.
 
 Numbers default to hexadecimals.
 
 ## Comments
 
-```
+```asm
 ; single line comment
 ```
 
 ## Data
 
 ```asm
-db 0
-dw 1 2 3 4
-db 'hello' A 0
-db ?
+db 00
+dw 01 02 03 04
+db 'hello' 0A 00
+dd ?
 
-times 200 - ($ - $$) db 0
+times 0200 - ($ - $$) db 00
 ```
 
 Also any two-character hexadecimal value not associated with an instruction is considered a byte definition.
@@ -49,8 +49,8 @@ For example:
 
 ; Is the same as:
 
-        db 0
-    arr dw 1 2 3
+        db 00
+    arr dw 01 02 03
 
 ; And:
 
@@ -70,8 +70,8 @@ For example:
 ```asm
 1234        ; hex
 ABCD        ; hex
-1010b       ; binary
 1234o       ; octal
+1010b       ; binary
 1234d       ; decimal
 ```
 
@@ -95,7 +95,7 @@ This label allows forward or backward reference according to the arrow direction
 ```asm
 val_to_hex_str
     pusha
-    mov di HEX_OUT + 5
+    mov di HEX_OUT + 05
     mov cx 04
   > mov ax bx
     and al 0F
@@ -111,7 +111,7 @@ val_to_hex_str
     popa
     ret
 
-HEX_OUT db '0x0000' 0
+HEX_OUT db '0x0000' 00
 ```
 
 ## Directives
@@ -135,7 +135,7 @@ Organizes offset.
 Aligns code or data to the specified boundary.
 
 ```asm
-@align 4
+@align 04
 ```
 
 ### @include
@@ -150,8 +150,8 @@ Includes a file to assembly if its extension is `.asm`; otherwise, includes as a
 
 ```asm
 @struct Point {
-    x db 0
-    y db 0
+    x db 00
+    y db 00
 }
 ```
 
@@ -165,7 +165,7 @@ Good for optimizing things.
 ```asm
 @print {
     mov eax ebx
-    add eax 1
+    add eax 01
 }
 @print 'optimized' {
     mov eax ebx
@@ -181,7 +181,7 @@ $ zasm example.asm
     size:       5 bytes
 
     89 D8       mov eax ebx
-    83 C0 01    add eax 1
+    83 C0 01    add eax 01
 
     --- optimized ---
 
@@ -193,10 +193,20 @@ $ zasm example.asm
 
 ### @define
 
-Defines a directive.
+```asm
+@define VALUE 0123
+```
+
+### @if
 
 ```asm
-@define VALUE 123
+@if VERSION == 0
+    ; code...
+@elseif VERSION == 1
+    ; code...
+@else
+    ; code...
+@end
 ```
 
 ### @ifndef
@@ -207,7 +217,7 @@ Includes code only if the parameter is not defined.
 @ifndef __PRINT__
 @define __PRINT__
     ; code...
-@endif
+@end
 ```
 
 ### @guard
@@ -220,12 +230,26 @@ Shorter form of `@ifndef @define @endif` that wraps the whole file.
 ; code...
 ```
 
-### @fn
+### @macro
 
-This would be a macro definition that abstracts a function call.
+> Explicit macro usage with #
 
 ```asm
-    @call example(eax, ebx, ecx, out r)
+@macro pushes a b {
+    push a
+    push b
+}
+
+    #pushes eax ebx
+    call hello
+```
+
+### @fn
+
+> This would abstract a function call.
+
+```asm
+    #example(eax, ebx, ecx, out r)
     mov eax r
     ret
 
@@ -239,18 +263,18 @@ This would be a macro definition that abstracts a function call.
 The code above would generate this:
 
 ```asm
-    sub  esp 4         ; "out" keyword reserves space for the returning value.
-    push ecx           ; "stack" keyword uses the stack.
+    sub  esp 04         ; "out" keyword reserves space for the returning value.
+    push ecx            ; "stack" keyword uses the stack.
     call example
-    add  esp 8
-    mov  eax [esp-4]   ; [esp-4] is r from "out r"
+    add  esp 08
+    mov  eax [esp-04]   ; [esp-04] is r from "out r"
     ret
 
 example 
-    push eax           ; "keep" keyword prevents trashing a register.
+    push eax            ; "keep" keyword prevents trashing a register.
     mov  eax ebx
-    add  eax [esp+4]   ; [esp+4] is v from "stack v"
-    mov  [esp+8] eax   ; [esp+8] is r from "out r"
+    add  eax [esp+04]   ; [esp+04] is v from "stack v"
+    mov  [esp+08] eax   ; [esp+08] is r from "out r"
     pop  eax
     ret
 ```
@@ -293,5 +317,5 @@ Defines templated structs.
 The definition above would become:
 
 ```asm
-code dq 0x00209A0000000000
+code dq 00209A0000000000
 ```
