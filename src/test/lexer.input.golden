@@ -133,3 +133,11 @@ example
     Limit       0
     G           0
 }
+
+; ----
+
+'abc'
+'def
+'ghi'jkl   ; invalid but not handled yet
+'1''2'     ; invalid but not handled yet
+'a' 'b'

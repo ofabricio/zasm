@@ -1,4 +1,4 @@
-package main
+package zasm
 
 import (
 	"bytes"
@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"reflect"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -21,15 +22,63 @@ func TestScanEmpty(t *testing.T) {
 	Equal(t, len(tokens), 0)
 }
 
-func TestScan90(t *testing.T) {
+func TestScanA(t *testing.T) {
 
-	src := `90`
+	src := "a"
 
 	tokens := Scan(strings.NewReader(src))
 
 	Equal(t, len(tokens), 1)
-	Equal(t, tokens[0].Text, "90")
+	Equal(t, tokens[0].Text, "a")
 	Equal(t, tokens[0].Type, "WORD")
+}
+
+func TestScanSemicolon(t *testing.T) {
+
+	src := ";"
+
+	tokens := Scan(strings.NewReader(src))
+
+	Equal(t, len(tokens), 0)
+}
+
+func TestScanQuote(t *testing.T) {
+
+	src := "'"
+
+	tokens := Scan(strings.NewReader(src))
+
+	Equal(t, len(tokens), 1)
+	Equal(t, tokens[0].Text, "'")
+	Equal(t, tokens[0].Type, "INVALID")
+}
+
+func TestScanInvalidString(t *testing.T) {
+
+	src := "'abc"
+
+	tokens := Scan(strings.NewReader(src))
+
+	Equal(t, len(tokens), 2)
+	Equal(t, tokens[0].Text, "'")
+	Equal(t, tokens[0].Type, "INVALID")
+	Equal(t, tokens[1].Text, "abc")
+	Equal(t, tokens[1].Type, "WORD")
+}
+
+func TestScanInvalidStringNL(t *testing.T) {
+
+	src := "'abc\n"
+
+	tokens := Scan(strings.NewReader(src))
+
+	Equal(t, len(tokens), 3)
+	Equal(t, tokens[0].Text, "'")
+	Equal(t, tokens[0].Type, "INVALID")
+	Equal(t, tokens[1].Text, "abc")
+	Equal(t, tokens[1].Type, "WORD")
+	Equal(t, tokens[2].Text, "\n")
+	Equal(t, tokens[2].Type, "NL")
 }
 
 func TestScan(t *testing.T) {
@@ -56,7 +105,11 @@ func TestScan(t *testing.T) {
 	all := ""
 	got := ""
 	for i, token := range toks {
-		str := fmt.Sprintf("%s %s %d %d", token.Text, token.Type, token.Row, token.Col)
+		txt := token.Text
+		if token.Type == "NL" {
+			txt = "\\n"
+		}
+		str := fmt.Sprintf("%s %s %d %d", txt, token.Type, token.Row, token.Col)
 		if str != exps[i] {
 			got += fmt.Sprintf("\nError at line %d: Exp: '%s', Got: '%s'", i+1, exps[i], str)
 		}
@@ -72,6 +125,7 @@ func TestScan(t *testing.T) {
 
 func Equal(t *testing.T, got, exp interface{}) {
 	if !reflect.DeepEqual(got, exp) {
-		t.Errorf("\nExp:\n%s\nGot:\n%s\n", exp, got)
+		_, fn, line, _ := runtime.Caller(1)
+		t.Fatalf("\n[error] %s:%d\nExp:\n%v\nGot:\n%v\n", fn, line, exp, got)
 	}
 }
