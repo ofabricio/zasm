@@ -21,9 +21,11 @@ Numbers default to hexadecimals.
 
 ## Data
 
+To define data you can either use `db 00` or `00`. Examples:
+
 ```asm
 db 00
-dw 01 02 03 04
+dw 01 02 03
 db 'hello' 0A 00
 dd ?
 
@@ -38,18 +40,18 @@ For example:
         00
     arr 01 00 02 00 03 00
 
-; Is the same as:
+; The above is the same as:
 
         db 00
     arr dw 01 02 03
+```
 
-; And:
-
+```asm
     mov eax ebx
     90
     mov ecx ebx
 
-; Is the same as:
+; The above is the same as:
 
     mov eax ebx
     nop
