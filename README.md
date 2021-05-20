@@ -21,7 +21,7 @@ Numbers default to hexadecimals.
 
 ## Data
 
-To define data you can either use `db 00` or `00`. Examples:
+To define data you can either use the data definition keywords or hexadecimal numbers. Examples:
 
 ```asm
 db 00
@@ -32,7 +32,7 @@ dd ?
 times 0200 - ($ - $$) db 00
 ```
 
-Also any two-character hexadecimal value not associated with an instruction is considered a byte definition.
+Also any two-character hexadecimal value not associated with an instruction is a byte definition.
 
 For example:
 
