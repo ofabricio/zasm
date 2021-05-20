@@ -3,15 +3,6 @@
 
 An assembler with a clean syntax.
 
-## Content
-
-* [General](#general)
-* [Comments](#comments)
-* [Data](#data)
-* [Directives](#directives)
-* [Labels](#labels)
-* [Numbers](#numbers)
-
 ## General
 
 No comma between operands.
