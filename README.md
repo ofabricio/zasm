@@ -47,13 +47,13 @@ For example:
 ```
 
 ```asm
-    mov eax ebx
+    mov eax 90
     90
     mov ecx ebx
 
 ; The above is the same as:
 
-    mov eax ebx
+    mov eax 90
     nop
     mov ecx ebx
 ```
