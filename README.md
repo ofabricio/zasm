@@ -217,6 +217,8 @@ Includes code only if the parameter is not defined.
 
 Shorter form of `@ifndef @define @endif` that wraps the whole file.
 
+> Maybe just make this the default behavior and @unguard to disable it.
+
 ```asm
 @guard __PRINT__
 
