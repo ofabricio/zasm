@@ -4,6 +4,14 @@ from metadata import registers
 def generate(ast):
     if ast[0] == 'Program':
         return [byte for stmt in ast[1] for byte in generate(stmt)]
+    if ast[0] == 'DD':
+        return gen_data_def(ast)
+    if ast[0] == 'Expr':
+        return generate(ast[1])
+    if ast[0] == 'Num':
+        return [int(ast[1], 16)]
+    if ast[0] == 'BinOp':
+        return [sum(generate(ast[1]) + generate(ast[3]))]
     if ast[0] == 'Inst':
         inst = ast[1]
         if inst == 'mov':
@@ -14,6 +22,14 @@ def generate(ast):
             a = ast[2]
             b = ast[3]
             return gen_add(a[1], b[1])
+    return []
+
+
+def gen_data_def(ast):
+    if ast[1] == 'db':
+        return [data for stmt in ast[2] for data in generate(stmt)]
+    if ast[1] == 'dw':
+        return [data for stmt in ast[2] for data in generate(stmt) + [0]]
     return []
 
 

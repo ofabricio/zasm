@@ -17,6 +17,11 @@ instructions = {
     'add': {'operands': 2},
 }
 
+data_def = {
+    'db',
+    'dw',
+}
+
 symbol_table = {
     '(': 'LPar',
     ')': 'RPar',

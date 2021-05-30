@@ -1,5 +1,5 @@
 import re
-from metadata import registers, instructions, symbol_table
+from metadata import registers, instructions, data_def, symbol_table
 
 
 def tokenize(input):
@@ -46,6 +46,8 @@ def typify(type, token):
         type = symbol_table[token]
     elif token in registers:
         type = 'Reg'
+    elif token in data_def:
+        type = 'DD'
     elif token in instructions:
         type = 'Inst'
     elif match(token, re_num):

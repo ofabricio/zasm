@@ -21,10 +21,13 @@ class Parser:
             self.skip('NL')
             if s := self.statement():
                 stmts.append(s)
+            else:
+                stmts.append(('Unknown', self.cur()))
+                self.advance()
         return stmts
 
     def statement(self):
-        return self.instruction() or self.expr()
+        return self.instruction() or self.data_def()
 
     def instruction(self):
         if i := self.match('Inst'):
@@ -33,9 +36,20 @@ class Parser:
                     return i + (a,) + (b,)
         return ()
 
+    def data_def(self):
+        dd = self.match('DD') or ('DD', 'db')
+        ns = self.collect(self.expr)
+        return dd + (ns,) if ns else ()
+
     def skip(self, type):
         while self.match(type):
             pass
+
+    def collect(self, fn):
+        xs = []
+        while x := fn():
+            xs.append(x)
+        return xs
 
     def expr(self):
         if x := self.expr_start():

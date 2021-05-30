@@ -1,4 +1,9 @@
-We are encoding the following instructions.
+Done so far:
+
+- [x] db
+- [x] dw
+
+Done encoding the following instructions:
 
 ### MOV
 
