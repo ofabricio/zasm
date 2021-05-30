@@ -52,19 +52,14 @@ class Parser:
         return xs
 
     def expr(self):
-        if x := self.expr_start():
-            return ('Expr', x)
-        return ()
-
-    def expr_start(self):
-        return self.bin_op(self.term, self.term_op, self.expr_start)
+        return self.bin_op(self.term, self.term_op, self.expr)
 
     def term(self):
         return self.bin_op(self.factor, self.factor_op, self.term)
 
     def factor(self):
         if self.match('LPar'):
-            if exp := self.expr_start():
+            if exp := self.expr():
                 if self.match('RPar'):
                     return exp
         if o := self.term_op():
