@@ -36,8 +36,8 @@ def tokenize(input):
 
 
 def match(str, pattern):
-    if match := re.match(pattern, str):
-        return match.span(0)[1]
+    if m := re.match(pattern, str):
+        return m.span(0)[1]
     return None
 
 
@@ -52,7 +52,7 @@ def typify(type, token):
         type = 'Inst'
     elif match(token, re_num):
         type = 'Num'
-    return (type, token)
+    return type, token
 
 
 re_nl = re.compile(r'\n')

@@ -10,10 +10,14 @@ def parse(tokens):
 
 class Parser:
 
+    def __init__(self):
+        self.pos = 0
+        self.tokens = []
+
     def parse(self, tokens):
         self.pos = 0
         self.tokens = tokens + [('EOF',)]
-        return ('Program', self.block('EOF'))
+        return 'Program', self.block('EOF')
 
     def block(self, end):
         stmts = []
@@ -63,7 +67,7 @@ class Parser:
                 if self.match('RPar'):
                     return exp
         if o := self.term_op():
-            return ('BinOp', ('Num', '00'), o, self.factor())
+            return 'BinOp', ('Num', '00'), o, self.factor()
         return self.match('Num')
 
     def term_op(self):
@@ -76,7 +80,7 @@ class Parser:
         a = fnA()
         if o := fnOp():
             if b := fnB():
-                return ('BinOp', a, o, b)
+                return 'BinOp', a, o, b
         return a
 
     def error(self, msg):

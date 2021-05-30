@@ -5,14 +5,14 @@ from assembler import Assembler
 
 def test_all():
 
-    assertFile('golden/lexer', lambda inp: tokenize(inp))
-    assertFile('golden/parser-datadef', lambda inp: parse(tokenize(inp)))
-    assertFile('golden/parser-instructions', lambda inp: parse(tokenize(inp)))
-    assertFile('golden/codegen-datadef', Assembler().assemble_prettyhex)
-    assertFile('golden/codegen-inst-mov', Assembler().assemble_prettyhex)
+    assert_file('golden/lexer', lambda inp: tokenize(inp))
+    assert_file('golden/parser-datadef', lambda inp: parse(tokenize(inp)))
+    assert_file('golden/parser-instructions', lambda inp: parse(tokenize(inp)))
+    assert_file('golden/codegen-datadef', Assembler().assemble_prettyhex)
+    assert_file('golden/codegen-inst-mov', Assembler().assemble_prettyhex)
 
 
-def assertFile(file, fn):
+def assert_file(file, fn):
     for inp, out in load_test_file(file):
         res = fn(inp)
         if str(res) != out:
