@@ -23,7 +23,7 @@ class Parser:
                 stmts.append(s)
             else:
                 stmts.append(('Unknown', self.cur()))
-                self.advance()
+                break
         return stmts
 
     def statement(self):
@@ -38,7 +38,7 @@ class Parser:
 
     def data_def(self):
         dd = self.match('DD') or ('DD', 'db')
-        ns = self.collect(self.expr)
+        ns = self.collect(lambda: self.match('Num'))
         return dd + (ns,) if ns else ()
 
     def skip(self, type):

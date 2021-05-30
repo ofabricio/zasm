@@ -6,9 +6,10 @@ from codegen import generate
 def test_all():
     def gen(inp): return bytes(generate(parse(tokenize(inp)))).hex(' ').upper()
     assertFile('golden/lexer', lambda inp: tokenize(inp))
-    assertFile('golden/parser', lambda inp: parse(tokenize(inp)))
-    assertFile('golden/codegen/inst-mov', gen)
-    assertFile('golden/codegen/datadef', gen)
+    assertFile('golden/parser-datadef', lambda inp: parse(tokenize(inp)))
+    assertFile('golden/parser-instructions', lambda inp: parse(tokenize(inp)))
+    assertFile('golden/codegen-datadef', gen)
+    assertFile('golden/codegen-inst-mov', gen)
 
 
 def assertFile(file, fn):

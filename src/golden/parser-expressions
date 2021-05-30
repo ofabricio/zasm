@@ -1,12 +1,4 @@
 ;
-; Data definitions.
-;
-90               ;; ('Program', [('DD', 'db', [('Num', '90')])])
-01 02            ;; ('Program', [('DD', 'db', [('Num', '01'), ('Num', '02')])])
-db 01 02         ;; ('Program', [('DD', 'db', [('Num', '01'), ('Num', '02')])])
-dw 01 02         ;; ('Program', [('DD', 'dw', [('Num', '01'), ('Num', '02')])])
-01 + 02 03 + 04  ;; ('Program', [('DD', 'db', [('BinOp', ('Num', '01'), ('AddOp', '+'), ('Num', '02')), ('BinOp', ('Num', '03'), ('AddOp', '+'), ('Num', '04'))])])
-;
 ; Expressions.
 ;
 01                    ;; ('Program', [('DD', 'db', [('Num', '01')])])
@@ -28,6 +20,3 @@ dw 01 02         ;; ('Program', [('DD', 'dw', [('Num', '01'), ('Num', '02')])])
 -01 + -02             ;; ('Program', [('DD', 'db', [('BinOp', ('BinOp', ('Num', '00'), ('SubOp', '-'), ('Num', '01')), ('AddOp', '+'), ('BinOp', ('Num', '00'), ('SubOp', '-'), ('Num', '02')))])])
 --01                  ;; ('Program', [('DD', 'db', [('BinOp', ('Num', '00'), ('SubOp', '-'), ('BinOp', ('Num', '00'), ('SubOp', '-'), ('Num', '01')))])])
 +01 + +02             ;; ('Program', [('DD', 'db', [('BinOp', ('BinOp', ('Num', '00'), ('AddOp', '+'), ('Num', '01')), ('AddOp', '+'), ('BinOp', ('Num', '00'), ('AddOp', '+'), ('Num', '02')))])])
-mov eax ebx       ;; ('Program', [('Inst', 'mov', ('Reg', 'eax'), ('Reg', 'ebx'))])
-mov eax ebx
-add eax ebx       ;; ('Program', [('Inst', 'mov', ('Reg', 'eax'), ('Reg', 'ebx')), ('Inst', 'add', ('Reg', 'eax'), ('Reg', 'ebx'))])

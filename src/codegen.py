@@ -6,12 +6,10 @@ def generate(ast):
         return [byte for stmt in ast[1] for byte in generate(stmt)]
     if ast[0] == 'DD':
         return gen_data_def(ast)
-    if ast[0] == 'Expr':
-        return generate(ast[1])
     if ast[0] == 'Num':
         return [int(ast[1], 16)]
     if ast[0] == 'BinOp':
-        return [sum(generate(ast[1]) + generate(ast[3]))]
+        return gen_binop(ast)
     if ast[0] == 'Inst':
         inst = ast[1]
         if inst == 'mov':
@@ -25,12 +23,47 @@ def generate(ast):
     return []
 
 
+def twos_comp(val, bits):
+    if (val & (1 << (bits - 1))) != 0:  # if sign bit is set e.g., 8bit: 128-255
+        val = val - (1 << bits)         # compute negative value
+    return val                          # return positive value as is
+
+
+def gen_binop(ast):
+    a = generate(ast[1])[0]
+    o = ast[2][0]
+    b = generate(ast[3])[0]
+    if o == 'AddOp':
+        return [a+b]
+    if o == 'SubOp':
+        return [a-b]
+    if o == 'MulOp':
+        return [a*b]
+    if o == 'DivOp':
+        return [a/b]
+    return []
+
+
 def gen_data_def(ast):
     if ast[1] == 'db':
-        return [data for stmt in ast[2] for data in generate(stmt)]
+        return [b for stmt in ast[2] for data in generate(stmt) for b in to_bytes(data)]
     if ast[1] == 'dw':
         return [data for stmt in ast[2] for data in generate(stmt) + [0]]
     return []
+
+
+def to_bytes(x):
+    signed = True if x < 0 else False
+    length = 1
+    a = abs(x)
+    # There must be an equation to remove the if checks.
+    if a > 255:
+        length = 2
+    if a > 255 * 255:
+        length = 3
+    if a > 255 * 255 * 255:
+        length = 4
+    return list(x.to_bytes(length, byteorder='big', signed=signed))
 
 
 def gen_mov(op1, op2):

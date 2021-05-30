@@ -1,7 +1,8 @@
 Done so far:
 
-- [x] db
-- [x] dw
+- [x] `db`
+- [x] `dw`
+- [x] Numeric data definition
 
 Done encoding the following instructions:
 
