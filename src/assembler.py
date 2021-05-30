@@ -18,18 +18,21 @@ class Assembler:
 
     def generate(self, ast):
         if ast[0] == 'Program':
-            return self.program(ast)
+            return self.advance_offset(self.program(ast))
         if ast[0] == 'DD':
             return self.advance_offset(self.datadef(ast))
-        if ast[0] == 'Num':
-            return self.number(ast)
-        if ast[0] == 'BinOp':
-            return self.binop(ast)
         if ast[0] == 'Directive':
             return self.advance_offset(self.directive(ast))
         if ast[0] == 'Inst':
             return self.advance_offset(self.instruction(ast))
         return []
+
+    def expr(self, ast):
+        if ast[0] == 'Num':
+            return self.number(ast)
+        if ast[0] == 'BinOp':
+            return self.binop(ast)
+        return 0
 
     def advance_offset(self, arr):
         self.offset = self.offset + len(arr)
@@ -48,7 +51,7 @@ class Assembler:
         return []
 
     def number(self, ast):
-        return [int(ast[1], 16)]
+        return int(ast[1], 16)
 
     def program(self, ast):
         return [byte for stmt in ast[1] for byte in self.generate(stmt)]
@@ -60,33 +63,33 @@ class Assembler:
         return []
 
     def directive_align(self, ast):
-        val = self.generate(ast[2])[0]
+        val = self.expr(ast[2])
         disp = val - (self.offset % val)
         if disp == val:
             disp = 0
         return [0 for _ in range(0, disp)]
 
     def binop(self, ast):
-        a = self.generate(ast[1])[0]
+        a = self.expr(ast[1])
         o = ast[2][0]
-        b = self.generate(ast[3])[0]
+        b = self.expr(ast[3])
         if o == 'AddOp':
-            return [a+b]
+            return a + b
         if o == 'SubOp':
-            return [a-b]
+            return a - b
         if o == 'MulOp':
-            return [a*b]
+            return a * b
         if o == 'DivOp':
-            return [a/b]
-        return []
+            return a / b
+        return 0
 
     def datadef(self, ast):
         if ast[1] == 'db':
-            return [data for stmt in ast[2] for data in self.generate(stmt)]
-        # return [b for stmt in ast[2] for data in self.generate(stmt) for b in self.to_bytes(data)]
+            return [self.expr(stmt) for stmt in ast[2]]
         if ast[1] == 'dw':
-            return [data for stmt in ast[2] for data in self.generate(stmt) + [0]]
+            return [b for stmt in ast[2] for b in [self.expr(stmt), 0]]
         return []
+
     #
     # def to_bytes(self, x):
     #     signed = True if x < 0 else False
@@ -115,4 +118,4 @@ class Assembler:
         mod = registers[op1]['Mod'] << 6
         reg = registers[op2]['REG'] << 3
         rm = registers[op1]['RM'] << 0
-        return [opcode, mod+reg+rm]
+        return [opcode, mod + reg + rm]
