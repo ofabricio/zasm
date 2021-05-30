@@ -64,6 +64,7 @@ class Assembler:
 
     def directive_align(self, ast):
         val = self.expr(ast[2])
+        val = min(val, 64)
         disp = val - (self.offset % val)
         if disp == val:
             disp = 0
