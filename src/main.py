@@ -1,16 +1,8 @@
 import sys
-from lexer import tokenize
-from parzer import parse
-from codegen import generate
-
-
-def assemble(input):
-    tokens = tokenize(input)
-    ast = parse(tokens)
-    return generate(ast)
+from assembler import Assembler
 
 
 if __name__ == '__main__':
     input = ' '.join(sys.argv[1:]).replace('\\n', '\n')
-    data = assemble(input)
-    print(bytes(data).hex(' ').upper())
+    data = Assembler().assemble_prettyhex(input)
+    print(data)

@@ -1,15 +1,15 @@
 from lexer import tokenize
 from parzer import parse
-from codegen import generate
+from assembler import Assembler
 
 
 def test_all():
-    def gen(inp): return bytes(generate(parse(tokenize(inp)))).hex(' ').upper()
+
     assertFile('golden/lexer', lambda inp: tokenize(inp))
     assertFile('golden/parser-datadef', lambda inp: parse(tokenize(inp)))
     assertFile('golden/parser-instructions', lambda inp: parse(tokenize(inp)))
-    assertFile('golden/codegen-datadef', gen)
-    assertFile('golden/codegen-inst-mov', gen)
+    assertFile('golden/codegen-datadef', Assembler().assemble_prettyhex)
+    assertFile('golden/codegen-inst-mov', Assembler().assemble_prettyhex)
 
 
 def assertFile(file, fn):
