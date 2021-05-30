@@ -1,15 +1,18 @@
+from assembler import Assembler
 from lexer import tokenize
 from parzer import parse
-from assembler import Assembler
 
 
 def test_all():
+    def gen(inp): return Assembler().assemble_prettyhex(inp)
 
     assert_file('golden/lexer', lambda inp: tokenize(inp))
     assert_file('golden/parser-datadef', lambda inp: parse(tokenize(inp)))
+    assert_file('golden/parser-directives', lambda inp: parse(tokenize(inp)))
     assert_file('golden/parser-instructions', lambda inp: parse(tokenize(inp)))
-    assert_file('golden/codegen-datadef', Assembler().assemble_prettyhex)
-    assert_file('golden/codegen-inst-mov', Assembler().assemble_prettyhex)
+    assert_file('golden/codegen-datadef', gen)
+    assert_file('golden/codegen-directive-align', gen)
+    assert_file('golden/codegen-inst-mov', gen)
 
 
 def assert_file(file, fn):

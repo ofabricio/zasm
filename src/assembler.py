@@ -5,6 +5,9 @@ from parzer import Parser
 
 class Assembler:
 
+    def __init__(self):
+        self.offset = 0
+
     def assemble(self, input):
         tokens = tokenize(input)
         ast = Parser().parse(tokens)
@@ -15,24 +18,53 @@ class Assembler:
 
     def generate(self, ast):
         if ast[0] == 'Program':
-            return [byte for stmt in ast[1] for byte in self.generate(stmt)]
+            return self.program(ast)
         if ast[0] == 'DD':
-            return self.data_def(ast)
+            return self.advance_offset(self.datadef(ast))
         if ast[0] == 'Num':
-            return [int(ast[1], 16)]
+            return self.number(ast)
         if ast[0] == 'BinOp':
             return self.binop(ast)
+        if ast[0] == 'Directive':
+            return self.advance_offset(self.directive(ast))
         if ast[0] == 'Inst':
-            inst = ast[1]
-            if inst == 'mov':
-                a = ast[2]
-                b = ast[3]
-                return self.inst_mov(a[1], b[1])
-            if inst == 'add':
-                a = ast[2]
-                b = ast[3]
-                return self.inst_add(a[1], b[1])
+            return self.advance_offset(self.instruction(ast))
         return []
+
+    def advance_offset(self, arr):
+        self.offset = self.offset + len(arr)
+        return arr
+
+    def instruction(self, ast):
+        inst = ast[1]
+        if inst == 'mov':
+            a = ast[2]
+            b = ast[3]
+            return self.inst_mov(a[1], b[1])
+        if inst == 'add':
+            a = ast[2]
+            b = ast[3]
+            return self.inst_add(a[1], b[1])
+        return []
+
+    def number(self, ast):
+        return [int(ast[1], 16)]
+
+    def program(self, ast):
+        return [byte for stmt in ast[1] for byte in self.generate(stmt)]
+
+    def directive(self, ast):
+        name = ast[1]
+        if name == 'align':
+            return self.directive_align(ast)
+        return []
+
+    def directive_align(self, ast):
+        val = self.generate(ast[2])[0]
+        disp = val - (self.offset % val)
+        if disp == val:
+            disp = 0
+        return [0 for _ in range(0, disp)]
 
     def binop(self, ast):
         a = self.generate(ast[1])[0]
@@ -48,25 +80,26 @@ class Assembler:
             return [a/b]
         return []
 
-    def data_def(self, ast):
+    def datadef(self, ast):
         if ast[1] == 'db':
-            return [b for stmt in ast[2] for data in self.generate(stmt) for b in self.to_bytes(data)]
+            return [data for stmt in ast[2] for data in self.generate(stmt)]
+        # return [b for stmt in ast[2] for data in self.generate(stmt) for b in self.to_bytes(data)]
         if ast[1] == 'dw':
             return [data for stmt in ast[2] for data in self.generate(stmt) + [0]]
         return []
-
-    def to_bytes(self, x):
-        signed = True if x < 0 else False
-        length = 1
-        a = abs(x)
-        # There must be an equation to remove the if checks.
-        if a > 255:
-            length = 2
-        if a > 255 * 255:
-            length = 3
-        if a > 255 * 255 * 255:
-            length = 4
-        return list(x.to_bytes(length, byteorder='big', signed=signed))
+    #
+    # def to_bytes(self, x):
+    #     signed = True if x < 0 else False
+    #     length = 1
+    #     a = abs(x)
+    #     # There must be an equation to remove the if checks.
+    #     if a > 255:
+    #         length = 2
+    #     if a > 255 * 255:
+    #         length = 3
+    #     if a > 255 * 255 * 255:
+    #         length = 4
+    #     return list(x.to_bytes(length, byteorder='big', signed=signed))
 
     def inst_mov(self, op1, op2):
         # Opcode | Instruction    | Op/En | 64-Bit Mode | Compat/Leg Mode | Description

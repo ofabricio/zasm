@@ -31,7 +31,15 @@ class Parser:
         return stmts
 
     def statement(self):
-        return self.instruction() or self.data_def()
+        return self.directive() or self.instruction() or self.data_def()
+
+    def directive(self):
+        if self.match('At'):
+            if i := self.match('Ident'):
+                if i[1] == 'align':
+                    if n := self.match('Num'):
+                        return 'Directive', i[1], n
+        return ()
 
     def instruction(self):
         if i := self.match('Inst'):
@@ -87,10 +95,10 @@ class Parser:
         raise Exception(msg)
 
     def match(self, type):
-        curtype = self.cur()[0]
-        if curtype != type:
-            return ()
-        return self.advance()
+        cur = self.cur()
+        if cur[0] == type:
+            return self.advance()
+        return ()
 
     def cur(self):
         return self.tokens[self.pos]

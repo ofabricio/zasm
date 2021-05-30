@@ -19,3 +19,5 @@ dw 90       ;; [('DD', 'dw'), ('Num', '90')]
 
 mov eax ebx     ;; [('Inst', 'mov'), ('Reg', 'eax'), ('Reg', 'ebx')]
 eax ebx ecx edx ;; [('Reg', 'eax'), ('Reg', 'ebx'), ('Reg', 'ecx'), ('Reg', 'edx')]
+
+@align 04       ;; [('At', '@'), ('Ident', 'align'), ('Num', '04')]

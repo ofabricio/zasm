@@ -3,6 +3,7 @@ Done so far:
 - [x] `db`
 - [x] `dw`
 - [x] Numeric data definition
+- [x] `@align` directive
 
 Done encoding the following instructions:
 

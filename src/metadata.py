@@ -34,6 +34,8 @@ symbol_table = {
     '-': 'SubOp',
     '*': 'MulOp',
     '/': 'DivOp',
+
+    '@': 'At',
 }
 
 """
