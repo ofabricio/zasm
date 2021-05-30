@@ -7,11 +7,15 @@ AB          ;; [('Num', 'AB')]
 hello       ;; [('Ident', 'hello')]
 90 hello    ;; [('Num', '90'), ('Ident', 'hello')]
 1d          ;; [('Num', '1d')]
+
 db 90       ;; [('DD', 'db'), ('Num', '90')]
 dw 90       ;; [('DD', 'dw'), ('Num', '90')]
+
 ; comment   ;; []
 ; comment
 ; comment   ;; [('NL', '\n')]
+
 ()          ;; [('LPar', '('), ('RPar', ')')]
+
 mov eax ebx     ;; [('Inst', 'mov'), ('Reg', 'eax'), ('Reg', 'ebx')]
 eax ebx ecx edx ;; [('Reg', 'eax'), ('Reg', 'ebx'), ('Reg', 'ecx'), ('Reg', 'edx')]

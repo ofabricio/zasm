@@ -1,6 +1,3 @@
-;
-; Expressions.
-;
 01                    ;; ('Program', [('DD', 'db', [('Num', '01')])])
 01 + 02               ;; ('Program', [('DD', 'db', [('BinOp', ('Num', '01'), ('AddOp', '+'), ('Num', '02'))])])
 01 + 02 * 03          ;; ('Program', [('DD', 'db', [('BinOp', ('Num', '01'), ('AddOp', '+'), ('BinOp', ('Num', '02'), ('MulOp', '*'), ('Num', '03')))])])

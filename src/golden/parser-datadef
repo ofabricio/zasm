@@ -1,8 +1,6 @@
-;
-; Data definitions.
-;
 90            ;; ('Program', [('DD', 'db', [('Num', '90')])])
 01 02         ;; ('Program', [('DD', 'db', [('Num', '01'), ('Num', '02')])])
+
 db 01         ;; ('Program', [('DD', 'db', [('Num', '01')])])
 db 01 02      ;; ('Program', [('DD', 'db', [('Num', '01'), ('Num', '02')])])
 dw 01         ;; ('Program', [('DD', 'dw', [('Num', '01')])])
