@@ -17,6 +17,12 @@ def tokenize(input):
         elif pos := match(input, re_comment):
             type = 'Comment'
 
+        elif pos := match(input, re_num_hex):
+            type = 'Num'
+
+        elif pos := match(input, re_num_dec):
+            type = 'Num'
+
         elif pos := match(input, re_alphanum):
             type = 'Ident'
 
@@ -50,8 +56,6 @@ def typify(type, token):
         type = 'DD'
     elif token in instructions:
         type = 'Inst'
-    elif match(token, re_num):
-        type = 'Num'
     return type, token
 
 
@@ -60,4 +64,5 @@ re_whitespace = re.compile(r'\s')
 re_alphanum = re.compile(r'[0-9a-zA-Z_]+')
 re_comment = re.compile(r'\;.*')
 re_symbols = re.compile(r'[()\[\]{}|&?*+\-<>$,.@#=]')
-re_num = re.compile(r'^(([0-9A-F][0-9A-F])+|[0-9]+d)$')
+re_num_hex = re.compile(r'[0-9A-F][0-9A-F]+\b')
+re_num_dec = re.compile(r'[0-9]+d\b')
