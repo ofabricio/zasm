@@ -34,18 +34,14 @@ class Parser:
         return self.directive() or self.instruction() or self.data_def()
 
     def directive(self):
-        if self.match('At'):
-            if i := self.match('Ident'):
-                if i[1] == 'align':
-                    if n := self.match('Num'):
-                        return 'Directive', i[1], n
+        if self.match('At') and (ident := self.match('Ident')):
+            if (ident[1] == 'align') and (n := self.match('Num')):
+                return 'Directive', ident[1], n
         return ()
 
     def instruction(self):
-        if i := self.match('Inst'):
-            if a := self.match('Reg'):
-                if b := self.match('Reg'):
-                    return i + (a,) + (b,)
+        if (i := self.match('Inst')) and (a := self.match('Reg')) and (b := self.match('Reg')):
+            return i + (a,) + (b,)
         return ()
 
     def data_def(self):
@@ -70,10 +66,8 @@ class Parser:
         return self.bin_op(self.factor, self.factor_op, self.term)
 
     def factor(self):
-        if self.match('LPar'):
-            if exp := self.expr():
-                if self.match('RPar'):
-                    return exp
+        if self.match('LPar') and (exp := self.expr()) and self.match('RPar'):
+            return exp
         if o := self.term_op():
             return 'BinOp', ('Num', '00'), o, self.factor()
         return self.match('Num')
@@ -86,9 +80,8 @@ class Parser:
 
     def bin_op(self, fnA, fnOp, fnB):
         a = fnA()
-        if o := fnOp():
-            if b := fnB():
-                return 'BinOp', a, o, b
+        if (o := fnOp()) and (b := fnB()):
+            return 'BinOp', a, o, b
         return a
 
     def error(self, msg):
