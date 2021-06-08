@@ -36,7 +36,7 @@ def tokenize(input):
             continue
 
         token = input[:pos]
-        tokens.append(typify(type, token))
+        tokens.append((typify(token) or type, token))
 
     return tokens
 
@@ -47,16 +47,16 @@ def match(str, pattern):
     return None
 
 
-def typify(type, token):
+def typify(token):
     if token in symbol_table:
-        type = symbol_table[token]
-    elif token in registers:
-        type = 'Reg'
-    elif token in data_def:
-        type = 'DD'
-    elif token in instructions:
-        type = 'Inst'
-    return type, token
+        return symbol_table[token]
+    if token in registers:
+        return 'Reg'
+    if token in data_def:
+        return 'DD'
+    if token in instructions:
+        return 'Inst'
+    return None
 
 
 re_nl = re.compile(r'\n')
