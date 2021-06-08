@@ -1,8 +1,5 @@
 import re
 
-instruction = re.compile(r'^(mov)$')
-registers32 = re.compile(r'^(eax|ebx)$')
-
 
 def parse(tokens):
     return Parser().parse(tokens)
