@@ -17,21 +17,23 @@ class Assembler:
         return bytes(self.assemble(input)).hex(' ').upper()
 
     def generate(self, ast):
-        if ast[0] == 'Program':
-            return self.advance_offset(self.program(ast))
-        if ast[0] == 'DD':
-            return self.advance_offset(self.datadef(ast))
-        if ast[0] == 'Directive':
-            return self.advance_offset(self.directive(ast))
-        if ast[0] == 'Inst':
-            return self.advance_offset(self.instruction(ast))
+        match ast[0]:
+            case 'Program':
+                return self.advance_offset(self.program(ast))
+            case 'DD':
+                return self.advance_offset(self.datadef(ast))
+            case 'Directive':
+                return self.advance_offset(self.directive(ast))
+            case 'Inst':
+                return self.advance_offset(self.instruction(ast))
         return []
 
     def expr(self, ast):
-        if ast[0] == 'Num':
-            return self.number(ast)
-        if ast[0] == 'BinOp':
-            return self.binop(ast)
+        match ast[0]:
+            case 'Num':
+                return self.number(ast)
+            case 'BinOp':
+                return self.binop(ast)
         return 0
 
     def advance_offset(self, arr):
@@ -39,15 +41,15 @@ class Assembler:
         return arr
 
     def instruction(self, ast):
-        inst = ast[1]
-        if inst == 'mov':
-            a = ast[2]
-            b = ast[3]
-            return self.inst_mov(a[1], b[1])
-        if inst == 'add':
-            a = ast[2]
-            b = ast[3]
-            return self.inst_add(a[1], b[1])
+        match ast[1]:
+            case 'mov':
+                a = ast[2]
+                b = ast[3]
+                return self.inst_mov(a[1], b[1])
+            case 'add':
+                a = ast[2]
+                b = ast[3]
+                return self.inst_add(a[1], b[1])
         return []
 
     def number(self, ast):
@@ -57,9 +59,9 @@ class Assembler:
         return [byte for stmt in ast[1] for byte in self.generate(stmt)]
 
     def directive(self, ast):
-        name = ast[1]
-        if name == 'align':
-            return self.directive_align(ast)
+        match ast[1]:
+            case 'align':
+                return self.directive_align(ast)
         return []
 
     def directive_align(self, ast):
@@ -74,21 +76,17 @@ class Assembler:
         a = self.expr(ast[1])
         o = ast[2][0]
         b = self.expr(ast[3])
-        if o == 'AddOp':
-            return a + b
-        if o == 'SubOp':
-            return a - b
-        if o == 'MulOp':
-            return a * b
-        if o == 'DivOp':
-            return a / b
+        match o:
+            case 'AddOp': return a + b
+            case 'SubOp': return a - b
+            case 'MulOp': return a * b
+            case 'DivOp': return a / b
         return 0
 
     def datadef(self, ast):
-        if ast[1] == 'db':
-            return [self.expr(stmt) for stmt in ast[2]]
-        if ast[1] == 'dw':
-            return [b for stmt in ast[2] for b in [self.expr(stmt), 0]]
+        match ast[1]:
+            case 'db': return [self.expr(stmt) for stmt in ast[2]]
+            case 'dw': return [b for stmt in ast[2] for b in [self.expr(stmt), 0]]
         return []
 
     #
