@@ -42,14 +42,8 @@ class Assembler:
 
     def instruction(self, ast):
         match ast[1]:
-            case 'mov':
-                a = ast[2]
-                b = ast[3]
-                return self.inst_mov(a[1], b[1])
-            case 'add':
-                a = ast[2]
-                b = ast[3]
-                return self.inst_add(a[1], b[1])
+            case 'mov': return self.inst_mov(ast)
+            case 'add': return self.inst_add(ast)
         return []
 
     def number(self, ast):
@@ -85,9 +79,15 @@ class Assembler:
 
     def datadef(self, ast):
         match ast[1]:
-            case 'db': return [self.expr(stmt) for stmt in ast[2]]
-            case 'dw': return [b for stmt in ast[2] for b in [self.expr(stmt), 0]]
+            case 'db': return self.datadef_db(ast)
+            case 'dw': return self.datadef_dw(ast)
         return []
+
+    def datadef_db(self, ast):
+        return [self.expr(stmt) for stmt in ast[2]]
+
+    def datadef_dw(self, ast):
+        return [b for stmt in ast[2] for b in [self.expr(stmt), 0]]
 
     #
     # def to_bytes(self, x):
@@ -103,15 +103,19 @@ class Assembler:
     #         length = 4
     #     return list(x.to_bytes(length, byteorder='big', signed=signed))
 
-    def inst_mov(self, op1, op2):
+    def inst_mov(self, ast):
+        op1 = ast[2]
+        op2 = ast[3]
         # Opcode | Instruction    | Op/En | 64-Bit Mode | Compat/Leg Mode | Description
         # 89 /r  | MOV r/m32,r32  | MR    | Valid       | Valid           | Move r32 to r/m32
-        return self.opcode_r32_r32(0x89, op1, op2)
+        return self.opcode_r32_r32(0x89, op1[1], op2[1])
 
-    def inst_add(self, op1, op2):
+    def inst_add(self, ast):
+        op1 = ast[2]
+        op2 = ast[3]
         # Opcode | Instruction    | Op/En | 64-Bit Mode | Compat/Leg Mode | Description
         # 01 /r  | ADD r/m32, r32 | MR    | Valid       | Valid           | Add r32 to r/m32.
-        return self.opcode_r32_r32(0x01, op1, op2)
+        return self.opcode_r32_r32(0x01, op1[1], op2[1])
 
     def opcode_r32_r32(self, opcode, op1, op2):
         mod = registers[op1]['Mod'] << 6
