@@ -248,7 +248,7 @@ Shorter form of `@ifndef @define @endif` that wraps the whole file.
     mov eax r
     ret
 
-@fn example (keep eax, ebx, stack v, out r) {
+@fn example (save eax, ebx, stack v, out r) {
     mov eax ebx
     add eax v
     mov r eax
@@ -266,7 +266,7 @@ The code above would generate this:
     ret
 
 example 
-    push eax            ; "keep" keyword prevents trashing a register.
+    push eax            ; "save" keyword prevents trashing a register.
     mov  eax ebx
     add  eax [esp+04]   ; [esp+04] is v from "stack v"
     mov  [esp+08] eax   ; [esp+08] is r from "out r"
@@ -276,7 +276,7 @@ example
 
 | Keyword | Description |
 | --- | --- |
-| `keep` | Prevents trashing a register. |
+| `save` | Prevents trashing a register by pushing it to the stack. |
 | `stack` | Pushes the value before calling the function. |
 | `out` | Reserves space on the stack for the returning value. If `out` uses a register the stack is not used. |
 | `v`, `r` | These are just aliases to parameters of type `stack` and `out`. Can use any name. |
