@@ -6,14 +6,6 @@ mov eax esp ;; 89 E0
 mov eax ebp ;; 89 E8
 mov eax esi ;; 89 F0
 
-mov ebx eax ;; 89 C3
-mov ebx ebx ;; 89 DB
-mov ebx ecx ;; 89 CB
-mov ebx edx ;; 89 D3
-mov ebx esp ;; 89 E3
-mov ebx ebp ;; 89 EB
-mov ebx esi ;; 89 F3
-
 mov ecx eax ;; 89 C1
 mov ecx ebx ;; 89 D9
 mov ecx ecx ;; 89 C9
@@ -29,6 +21,14 @@ mov edx edx ;; 89 D2
 mov edx esp ;; 89 E2
 mov edx ebp ;; 89 EA
 mov edx esi ;; 89 F2
+
+mov ebx eax ;; 89 C3
+mov ebx ebx ;; 89 DB
+mov ebx ecx ;; 89 CB
+mov ebx edx ;; 89 D3
+mov ebx esp ;; 89 E3
+mov ebx ebp ;; 89 EB
+mov ebx esi ;; 89 F3
 
 mov esp eax ;; 89 C4
 mov esp ebx ;; 89 DC
