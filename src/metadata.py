@@ -13,6 +13,7 @@ registers = {
     'esp': {'Mod': 3, 'REG': 4, 'RM': 4, 'bits': 32},
     'ebp': {'Mod': 3, 'REG': 5, 'RM': 5, 'bits': 32},
     'esi': {'Mod': 3, 'REG': 6, 'RM': 6, 'bits': 32},
+    'edi': {'Mod': 3, 'REG': 7, 'RM': 7, 'bits': 32},
 }
 
 instructions = {
