@@ -7,9 +7,10 @@ Tokens in Parser:
 
 registers = {
     'eax': {'Mod': 3, 'REG': 0, 'RM': 0, 'bits': 32},
-    'ebx': {'Mod': 3, 'REG': 3, 'RM': 3, 'bits': 32},
     'ecx': {'Mod': 3, 'REG': 1, 'RM': 1, 'bits': 32},
     'edx': {'Mod': 3, 'REG': 2, 'RM': 2, 'bits': 32},
+    'ebx': {'Mod': 3, 'REG': 3, 'RM': 3, 'bits': 32},
+    'esp': {'Mod': 3, 'REG': 4, 'RM': 4, 'bits': 32},
 }
 
 instructions = {
