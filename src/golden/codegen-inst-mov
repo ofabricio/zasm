@@ -51,6 +51,7 @@ mov esi ebx ;; 89 DE
 mov esi ecx ;; 89 CE
 mov esi edx ;; 89 D6
 mov esi esp ;; 89 E6
+mov esi ebp ;; 89 EE
 mov esi esi ;; 89 F6
 
 mov eax ebx
