@@ -1,3 +1,0 @@
-mov eax ebx       ;; ('Program', [('Inst', 'mov', ('Reg', 'eax'), ('Reg', 'ebx'))])
-mov eax ebx
-add eax ebx       ;; ('Program', [('Inst', 'mov', ('Reg', 'eax'), ('Reg', 'ebx')), ('Inst', 'add', ('Reg', 'eax'), ('Reg', 'ebx'))])
