@@ -1,0 +1,12 @@
+{ dir @64 | O 0 | B 0 | S 0 }
+{ ins mov | O 0 | B 0 | S 2 | A [{ r32 eax | O 0 | B 0 | S 0 }, { r32 eax | O 0 | B 0 | S 0 }] }
+{ refdef > | O 2 | B 0 | S 0 }
+{ ins mov | O 2 | B 0 | S 5 | A [{ r32 eax | O 0 | B 0 | S 0 }, { lab mem | O 7 | B 0 | S 0 }] }
+{ dir @print | O 7 | B 0 | S 11 | A [{ labdef mem | O 7 | B 0 | S 0 }, { def db | O 7 | B 0 | S 1 | A [{ cst 90 | O 0 | B 0 | S 0 }] }, { labdef a | O 8 | B 0 | S 0 }, { ins mov | O 8 | B 0 | S 5 | A [{ r32 eax | O 0 | B 0 | S 0 }, { lab a | O 8 | B 0 | S 0 }] }, { ins mov | O 13 | B 0 | S 5 | A [{ r32 eax | O 0 | B 0 | S 0 }, { ref < | O 2 | B 0 | S 0 }] }] }
+{ ins mov | O 18 | B 0 | S 5 | A [{ r32 eax | O 0 | B 0 | S 0 }, { ref > | O 28 | B 0 | S 0 }] }
+{ ins mov | O 23 | B 0 | S 5 | A [{ r32 eax | O 0 | B 0 | S 0 }, { ref >> | O 30 | B 0 | S 0 }] }
+{ dir @align | O 28 | B 0 | S 0 | A [{ cst 4 | O 0 | B 0 | S 0 }] }
+{ refdef > | O 28 | B 0 | S 0 }
+{ ins mov | O 28 | B 0 | S 2 | A [{ r32 eax | O 0 | B 0 | S 0 }, { r32 eax | O 0 | B 0 | S 0 }] }
+{ refdef > | O 30 | B 0 | S 0 }
+{ ins mov | O 30 | B 0 | S 5 | A [{ r32 eax | O 0 | B 0 | S 0 }, { ref <<< | O 2 | B 0 | S 0 }] }

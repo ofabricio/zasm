@@ -1,0 +1,15 @@
+
+    @64
+    mov eax eax	    ; 89 C0
+  > mov eax mem	    ; B8 07 00 00 00
+@print {
+    mem db 90       ; 90
+a
+    mov eax a       ; B8 08 00 00 00
+    mov eax <       ; B8 02 00 00 00
+}
+    mov eax >       ; B8 20 00 00 00
+    mov eax >>      ; B8 25 00 00 00
+@align 4            ;
+  > mov eax eax     ; 89 C0
+  > mov eax <<<     ; B8 02 00 00 00
