@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -385,4 +386,87 @@ func (t *codegenVisitor) Visit(n *Ast) Visitor {
 		}
 	}
 	return t
+}
+
+type printDirectiveVisitor struct {
+	buf io.Writer
+	dep int
+}
+
+func (v *printDirectiveVisitor) Visit(n *Ast) Visitor {
+	switch n.Type {
+	case "program":
+		v.nl()
+		for _, a := range n.Args {
+			if v.isFatPrint(a) {
+				v.nl()
+				Walk(v, a)
+			}
+		}
+		v.nl()
+		return nil
+	case "dir":
+		if n.Name.Text == "@print" && len(n.Args) != 0 {
+			v.dep++
+			v.pad()
+			v.print("[%d bytes]", n.Size)
+			v.nl()
+			v.pad()
+			v.nl()
+			var prev *Ast
+			for i, a := range n.Args {
+				if i > 0 && (v.isFatPrint(a) || v.isFatPrint(prev)) {
+					v.pad()
+					v.nl()
+				}
+				prev = a
+				Walk(v, a)
+			}
+			v.dep--
+			return nil
+		}
+	case "ins", "def":
+		v.pad()
+		v.print("% X", Generate(n))
+		v.print("    %s", n.Name.Text)
+		for _, a := range n.Args {
+			v.print(" %s", a.Name.Text)
+		}
+		v.nl()
+		return nil
+	}
+	return nil
+}
+
+// Fat Print means that it is a print directive
+// with at least one instruction in it's body.
+func (v *printDirectiveVisitor) isFatPrint(a *Ast) bool {
+	if a.Type == "dir" && a.Name.Text == "@print" {
+		for _, arg := range a.Args {
+			if arg.Type != "dir" || arg.Name.Text != "@print" {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (v *printDirectiveVisitor) print(format string, token ...interface{}) {
+	fmt.Fprintf(v.buf, format, token...)
+}
+
+func (v *printDirectiveVisitor) pad() {
+	pad := "    "
+	if v.dep > 0 {
+		pad = "|   "
+	}
+	dep := v.dep - 1
+	if dep < 0 {
+		dep = 0
+	}
+	fmt.Fprint(v.buf, "    "+strings.Repeat(pad, dep))
+}
+
+func (v *printDirectiveVisitor) nl() {
+	fmt.Fprint(v.buf, "\n")
 }
