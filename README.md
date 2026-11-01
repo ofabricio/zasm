@@ -1,17 +1,13 @@
-
 ![stage](https://img.shields.io/static/v1?label=stage&message=draft&color=red)
 
-An assembler with a clean syntax.
+An assembler.
 
 ## General
 
-No comma between operands.
-
-Instructions and registers must be lowercase.
-
-Hexadecimal numbers must be uppercase and appear in pairs.
-
-Numbers default to hexadecimals.
+- No comma between operands.
+- Instructions and registers must be lowercase.
+- Hexadecimal numbers must be uppercase.
+- Numbers default to hexadecimals.
 
 ## Comments
 
@@ -19,43 +15,33 @@ Numbers default to hexadecimals.
 ; single line comment
 ```
 
-## Data
+## Data definition
 
-To define data you can either use the data definition keywords or hexadecimal numbers. Examples:
+To define data use the data definition keywords.
 
 ```asm
-db 00
-dw 01 02 03
-db 'hello' 0A 00
-dd ?
-
-times 0200 - ($ - $$) db 00
+d1 'hello' 00    ; define a string bytes
+d1  01           ; define 1 byte     (8 bits)
+d2  01           ; define 2 bytes   (16 bits)
+d4  01           ; define 4 bytes   (32 bits)
+d6  01           ; define 4 bytes   (48 bits)
+d8  01           ; define 8 bytes   (64 bits)
+d10 01           ; define 10 bytes  (80 bits)
+d16 01           ; define 16 bytes (128 bits)
+d32 01           ; define 32 bytes (256 bits)
+d64 01           ; define 64 bytes (512 bits)
 ```
 
 Also any two-character hexadecimal value not associated with an instruction is a byte definition.
 
-For example:
-
 ```asm
-        00
-    arr 01 00 02 00 03 00
+    00
+    01 00 02 00 03 00
 
-; The above is the same as:
+; the above is the same as:
 
-        db 00
-    arr dw 01 02 03
-```
-
-```asm
-    mov eax 90
-    90
-    mov ecx ebx
-
-; The above is the same as:
-
-    mov eax 90
-    nop
-    mov ecx ebx
+    d1 00
+    d2 01 02 03
 ```
 
 ## Numbers
@@ -70,20 +56,21 @@ ABCD        ; hex
 
 ## Labels
 
-Labels are _global_, _local_ or _reference_ labels.
+There are two types of labels: texts and references.
+
+#### Text labels
+
+A text label is any word that is not a keyword or hexadecimal value.
 
 ```asm
-global_label
-    mov eax ebx
-.loc_label
-    dec eax
-    jnz .loc_label
+a_label
+    xor eax eax
     ret
 ```
 
 #### Reference labels
 
-This label allows forward or backward reference according to the arrow direction.
+A reference label allows forward or backward reference according to the arrow direction and amount.
 
 ```asm
 val_to_hex_str
@@ -104,7 +91,7 @@ val_to_hex_str
     popa
     ret
 
-HEX_OUT db '0x0000' 00
+HEX_OUT d1 '0x0000' 00
 ```
 
 ## Directives
@@ -139,31 +126,21 @@ Includes a file to assembly if its extension is `.asm`; otherwise, includes as a
 @include 'example.asm'
 ```
 
-### @struct
-
-```asm
-@struct Point {
-    x db 00
-    y db 00
-}
-```
-
 ### @print
 
 > Or maybe @debug
 
 Prints information about a piece of code at assembly time.
-Good for optimizing things.
 
 ```asm
-@print {
+@print
     mov eax ebx
     add eax 01
-}
-@print 'optimized' {
+@end
+@print 'optimized'
     mov eax ebx
     inc eax
-}
+@end
 ```
 
 The code above would print:
@@ -230,13 +207,22 @@ Shorter form of `@ifndef @define @endif` that wraps the whole file.
 > Explicit macro usage with #
 
 ```asm
-@macro pushes a b {
+@macro pushes a b
     push a
     push b
-}
+@end
 
     #pushes eax ebx
     call hello
+```
+
+### @times
+
+Repeats data n times.
+
+```asm
+; @times <n> <dd> <value>
+@times 0200 - ($ - $$) d1 00
 ```
 
 ### @fn
@@ -248,14 +234,14 @@ Shorter form of `@ifndef @define @endif` that wraps the whole file.
     mov eax r
     ret
 
-@fn example (save eax, ebx, stack v, out r) {
+@fn example (save eax, ebx, stack v, out r)
     mov eax ebx
     add eax v
     mov r eax
-}
+@end
 ```
 
-The code above would generate this:
+The code above would generate:
 
 ```asm
     sub  esp 04         ; "out" keyword reserves space for the returning value.
@@ -288,11 +274,9 @@ Defines templated structs.
 > A template language would allow the definition of templates like the example below.
 > Many well-known structs like GDT, IDT, etc. would be predefined making it
 > easy to setup them.
->
-> TODO: describe the template language.
 
 ```asm
-@template 'GDT' code {
+code @template 'GDT'
     Base        0
     Limit       0
     G           0
@@ -306,11 +290,11 @@ Defines templated structs.
     Conforming  0
     Readable    1
     Accessed    0
-}
+@end
 ```
 
 The definition above would become:
 
 ```asm
-code dq 00209A0000000000
+code d8 00209A0000000000
 ```
