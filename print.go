@@ -7,39 +7,40 @@ import (
 )
 
 func PrintNode(n Node, out io.Writer) {
-	Visit(n, &NodePrinter{}, out)
+	Visit(n, &NodePrinter{out: out})
 }
 
 type NodePrinter struct {
 	depth int
+	out   io.Writer
 }
 
-func (p *NodePrinter) Print(s string, out io.Writer) {
-	fmt.Fprintf(out, "%s%v\n", strings.Repeat("    ", p.depth), s)
+func (p *NodePrinter) Print(s string) {
+	fmt.Fprintf(p.out, "%s%v\n", strings.Repeat("    ", p.depth), s)
 }
 
-func (p *NodePrinter) VisitMany(n []Node, out io.Writer) {
+func (p *NodePrinter) VisitMany(n []Node) {
 	p.depth++
-	VisitMany(n, p, out)
+	VisitMany(n, p)
 	p.depth--
 }
 
-func (p *NodePrinter) VisitProgram(n *Program, out io.Writer) {
-	p.Print("Program [", out)
-	p.VisitMany(n.Body, out)
-	p.Print("]", out)
+func (p *NodePrinter) VisitProgram(n *Program) {
+	p.Print("Program [")
+	p.VisitMany(n.Body)
+	p.Print("]")
 }
 
-func (p *NodePrinter) VisitLabelDef(n *LabelDef, out io.Writer) {
-	p.Print(fmt.Sprintf("Label [%s]", n.Token.Text), out)
+func (p *NodePrinter) VisitLabelDef(n *LabelDef) {
+	p.Print(fmt.Sprintf("Label [%s]", n.Token.Text))
 }
 
-func (p *NodePrinter) VisitDataDef(n *DataDef, out io.Writer) {
-	p.Print("DataDef [", out)
-	p.VisitMany(n.Body, out)
-	p.Print("]", out)
+func (p *NodePrinter) VisitDataDef(n *DataDef) {
+	p.Print("DataDef [")
+	p.VisitMany(n.Body)
+	p.Print("]")
 }
 
-func (p *NodePrinter) VisitHexLiteral(n *HexLiteral, out io.Writer) {
-	p.Print(fmt.Sprintf("Hex [%s]", n.Token.Text), out)
+func (p *NodePrinter) VisitHexLiteral(n *HexLiteral) {
+	p.Print(fmt.Sprintf("Hex [%s]", n.Token.Text))
 }

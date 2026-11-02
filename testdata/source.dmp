@@ -2,11 +2,11 @@
     01 02            ; 01 02
     01 02 03         ; 01 02 03
     0123456789ABCDEF ; 01 23 45 67 89 AB CD EF
- a                   ; OFFSET 0x0E
+ a                   ; OFFSET 0E
     01               ; 01
- ab                  ; OFFSET 0x0F
+ ab                  ; OFFSET 0F
     01               ; 01
- a_b                 ; OFFSET 0x10
+ a_b                 ; OFFSET 10
     01               ; 01
- >                   ; OFFSET 0x11
+ >                   ; OFFSET 11
     01               ; 01
