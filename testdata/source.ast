@@ -1,0 +1,33 @@
+Program [
+    DataDef [
+        Hex [00]
+    ]
+    DataDef [
+        Hex [01]
+        Hex [02]
+    ]
+    DataDef [
+        Hex [01]
+        Hex [02]
+        Hex [03]
+    ]
+    DataDef [
+        Hex [0123456789ABCDEF]
+    ]
+    Label [a]
+    DataDef [
+        Hex [01]
+    ]
+    Label [ab]
+    DataDef [
+        Hex [01]
+    ]
+    Label [a_b]
+    DataDef [
+        Hex [01]
+    ]
+    Label [>]
+    DataDef [
+        Hex [01]
+    ]
+]
