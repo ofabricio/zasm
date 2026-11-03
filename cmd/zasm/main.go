@@ -1,26 +1,45 @@
 package main
 
 import (
+	"flag"
+	"fmt"
+	"io"
 	"os"
 
 	"github.com/ofabricio/zasm"
 )
 
 func main() {
-	src := os.Args[1]
+
+	var src string
+	var out string
+
+	flag.StringVar(&src, "src", "", "the source code file")
+	flag.StringVar(&out, "out", "", "the binary output file")
+	flag.Parse()
 
 	data, err := os.ReadFile(src)
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("source file: %w", err))
 	}
 
 	var prg zasm.Program
 	var oks = zasm.Parse(string(data), &prg)
 
 	if !oks {
-		panic("failed to parse " + src)
+		panic("failed to parse source code")
 	}
 
-	zasm.Resolve(&prg)
-	zasm.Dump(&prg, os.Stdout)
+	tgt := io.Discard
+
+	if out != "" {
+		f, err := os.Create(out)
+		if err != nil {
+			panic(fmt.Errorf("failed to create output file: %w", err))
+		}
+		defer f.Close()
+		tgt = f
+	}
+
+	zasm.Assemble(&prg, os.Stdout, tgt)
 }

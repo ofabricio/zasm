@@ -1,8 +1,9 @@
 package zasm
 
 import (
+	"bytes"
+	"fmt"
 	"os"
-	"strings"
 	"testing"
 )
 
@@ -11,22 +12,21 @@ func TestAssemble(t *testing.T) {
 	srcf, _ := os.ReadFile("testdata/source.asm")
 	astf, _ := os.ReadFile("testdata/source.ast")
 	dmpf, _ := os.ReadFile("testdata/source.dmp")
+	binf, _ := os.ReadFile("testdata/source.bin")
 
 	var prg Program
 	var oks = Parse(string(srcf), &prg)
 
-	Resolve(&prg)
+	var bin bytes.Buffer
+	var dmp bytes.Buffer
+	var ast bytes.Buffer
 
-	// var bin []byte
-	// Assemble(&prg, &bin)
+	Assemble(&prg, &dmp, &bin)
 
-	var ast strings.Builder
 	PrintNode(&prg, &ast)
 
-	var dmp strings.Builder
-	Dump(&prg, &dmp)
-
 	assert(t, true, oks, "")
-	assert(t, strings.TrimSpace(string(astf)), strings.TrimSpace(ast.String()), "")
+	assert(t, string(astf), ast.String(), "")
 	assert(t, string(dmpf), dmp.String(), "")
+	assert(t, string(binf), fmt.Sprintf("%X", bin.Bytes()), "")
 }

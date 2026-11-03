@@ -1,9 +1,5 @@
 package zasm
 
-func Resolve(n *Program) {
-	Visit(n, &Resolver{})
-}
-
 type Resolver struct {
 	offset int
 }
@@ -22,4 +18,8 @@ func (r *Resolver) VisitDataDef(n *DataDef) {
 
 func (r *Resolver) VisitHexLiteral(n *HexLiteral) {
 	r.offset += len(n.Token.Text) / 2
+}
+
+func (r *Resolver) VisitDirDump(n *DirDump) {
+	VisitMany(n.Body, r)
 }

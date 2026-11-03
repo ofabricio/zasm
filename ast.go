@@ -18,3 +18,8 @@ type LabelDef struct {
 type HexLiteral struct {
 	Token Token
 }
+
+type DirDump struct {
+	Bytes int
+	Body  []Node
+}

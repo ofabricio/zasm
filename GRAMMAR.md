@@ -1,6 +1,12 @@
-prog = (vs (stmt | cmmt))*
+prog = stmts
 
-stmt = datadef | instr | labeldef
+stmts = ( stmt | cmt )*
+
+stmt = datadef | labeldef | directive
+
+directive = dirdump
+
+dirdump = '@dump' int? stmts '@end'
 
 datadef = hex
 
@@ -8,8 +14,10 @@ labeldef = '(\w+|>)'r
 
 hex = '[0-9A-F]+\b'r
 
-cmmt = ';[^\n]*'r
+cmt = ';[^\n]*'r
 
-hs = '[ \t]+'r
+int = '\d+'r
 
-vs = '\s+'r
+hsp = '[ \t]+'r
+
+vsp = '\s+'r

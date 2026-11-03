@@ -1,3 +1,4 @@
+@dump
 
 ; data definition
 
@@ -12,3 +13,14 @@
      ab 01
     a_b 01
       > 01                      ; reference label
+
+    @dump 8
+        0102030405060708 1020304050607080
+    @end
+        0123456789ABCDEF
+
+    @dump
+        01 02
+    @end
+
+@end

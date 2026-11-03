@@ -5,6 +5,7 @@ type Visitor interface {
 	VisitLabelDef(*LabelDef)
 	VisitDataDef(*DataDef)
 	VisitHexLiteral(*HexLiteral)
+	VisitDirDump(*DirDump)
 }
 
 func Visit(n Node, v Visitor) {
@@ -17,6 +18,8 @@ func Visit(n Node, v Visitor) {
 		v.VisitDataDef(n)
 	case *HexLiteral:
 		v.VisitHexLiteral(n)
+	case *DirDump:
+		v.VisitDirDump(n)
 	}
 }
 

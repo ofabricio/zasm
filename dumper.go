@@ -1,94 +1,99 @@
 package zasm
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 )
 
-func Dump(n *Program, out io.Writer) {
-	c := &CodeWidth{}
-	Visit(n, c)
-	Visit(n, &CodeDumper{width: c.width, out: out})
+type DumpWriter struct {
+	out io.Writer
+	off int
+	siz int
 }
 
-type CodeDumper struct {
-	width int
-	out   io.Writer
-	pos   int
+func (d *DumpWriter) SetOffset(v int) {
+	d.off = v
 }
 
-func (d *CodeDumper) VisitProgram(n *Program) {
-	d.width += 5
-	VisitMany(n.Body, d)
+func (d *DumpWriter) SetBytes(v int) {
+	d.siz = v
 }
 
-func (d *CodeDumper) VisitLabelDef(n *LabelDef) {
-	d.writeCode(" ")
-	d.writeCode(n.Token.Text)
-	d.writePad()
-	fmt.Fprintf(d.out, " OFFSET %02X", n.Offset)
-	d.writeNL()
+func (d *DumpWriter) WriteTitle(n int) {
+	fmt.Fprintf(d.out, "\n    --- %d bytes ---\n\n", n)
 }
 
-func (d *CodeDumper) VisitDataDef(n *DataDef) {
-	d.writeCode("   ")
-	for _, n := range n.Body {
-		d.writeCode(" ")
-		Visit(n, d)
-	}
-	d.writePad()
-	var b bytes.Buffer
-	Assemble(n, &b)
-	for _, b := range b.Bytes() {
+func (d *DumpWriter) WriteLabel(n *LabelDef) {
+	fmt.Fprintf(d.out, "    %s\n", n.Token.Text)
+}
+
+func (d *DumpWriter) WriteInstr(n Node, bin []byte) {
+	pad := 4
+	code := false
+	for i, b := range bin {
+		if (i)%d.siz == 0 {
+			d.dumpOffset()
+		}
 		fmt.Fprintf(d.out, " %02X", b)
+		if (i+1)%d.siz == 0 {
+			if !code {
+				d.writePad(pad)
+				d.dumpCode(n)
+				code = true
+			}
+			d.WriteNL()
+		}
+		d.off++
 	}
-	d.writeNL()
-}
-
-func (d *CodeDumper) VisitHexLiteral(n *HexLiteral) {
-	d.writeCode(n.Token.Text)
-}
-
-func (d *CodeDumper) writeCode(v string) {
-	fmt.Fprint(d.out, v)
-	d.pos += len(v)
-}
-
-func (d *CodeDumper) writePad() {
-	for range d.width - d.pos {
-		fmt.Fprint(d.out, " ")
+	if !code {
+		d.writePad(d.siz*3 - len(bin)*3 + pad)
+		d.dumpCode(n)
+		d.WriteNL()
 	}
-	fmt.Fprint(d.out, ";")
 }
 
-func (d *CodeDumper) writeNL() {
-	d.pos = 0
+func (d *DumpWriter) WriteNL() {
 	fmt.Fprint(d.out, "\n")
 }
 
-type CodeWidth struct {
-	width int
+func (d *DumpWriter) dumpOffset() {
+	d.writeTabs()
+	fmt.Fprintf(d.out, "%08X ", d.off)
 }
 
-func (d *CodeWidth) VisitProgram(n *Program) {
-	VisitMany(n.Body, d)
+func (d *DumpWriter) dumpCode(n Node) {
+	Unparse(n, d.out)
 }
 
-func (d *CodeWidth) VisitLabelDef(n *LabelDef) {
-	d.width = max(d.width, len(n.Token.Text))
+func (d *DumpWriter) writeTabs() {
+	d.writePad(4)
 }
 
-func (d *CodeWidth) VisitDataDef(n *DataDef) {
-	sum := len(n.Body) - 1
-	for _, n := range n.Body {
-		w := CodeWidth{}
-		Visit(n, &w)
-		sum += w.width
+func (d *DumpWriter) writePad(n int) {
+	for range n {
+		fmt.Fprint(d.out, " ")
 	}
-	d.width = max(d.width, sum)
 }
 
-func (d *CodeWidth) VisitHexLiteral(n *HexLiteral) {
-	d.width = len(n.Token.Text)
+type BytesCounter struct {
+	count int
+}
+
+func (c *BytesCounter) VisitProgram(n *Program) {
+	VisitMany(n.Body, c)
+}
+
+func (c *BytesCounter) VisitLabelDef(n *LabelDef) {
+}
+
+func (c *BytesCounter) VisitDataDef(n *DataDef) {
+	VisitMany(n.Body, c)
+}
+
+func (c *BytesCounter) VisitHexLiteral(n *HexLiteral) {
+	c.count += len(n.Token.Text) / 2
+}
+
+func (c *BytesCounter) VisitDirDump(n *DirDump) {
+	VisitMany(n.Body, c)
 }

@@ -2,12 +2,38 @@
 
 An assembler.
 
-## General
+## How to run
+
+```sh
+git clone --depth 1 https://github.com/ofabricio/zasm.git
+cd zasm
+go run cmd/zasm/main.go --src the_source_code.asm --out the_output.bin
+```
+
+## Implemented features
+
+- [ ] Data definition keywords
+- [x] Two-character hexadecimal value data definition
+- [x] Label definition (text and reference)
+- [x] Comments
+- [ ] Instructions
+- [x] @dump
+- [ ] @org
+- [ ] @align
+- [ ] @include
+- [ ] @times
+- [ ] @macro
+- [ ] @if @define @ifndef @guard
+- [ ] @16 @32 @64
+- [ ] @fn
+- [ ] @template
+
+## General guidelines
 
 - No comma between operands.
 - Instructions and registers must be lowercase.
 - Hexadecimal numbers must be uppercase.
-- Numbers default to hexadecimals.
+- Numbers default to hexadecimal.
 
 ## Comments
 
@@ -17,14 +43,14 @@ An assembler.
 
 ## Data definition
 
-To define data use the data definition keywords.
+To define data, use the data definition keywords.
 
 ```asm
-d1 'hello' 00    ; define a string bytes
+d1 'hello' 00    ; define a string of bytes
 d1  01           ; define 1 byte     (8 bits)
 d2  01           ; define 2 bytes   (16 bits)
 d4  01           ; define 4 bytes   (32 bits)
-d6  01           ; define 4 bytes   (48 bits)
+d6  01           ; define 6 bytes   (48 bits)
 d8  01           ; define 8 bytes   (64 bits)
 d10 01           ; define 10 bytes  (80 bits)
 d16 01           ; define 16 bytes (128 bits)
@@ -32,7 +58,7 @@ d32 01           ; define 32 bytes (256 bits)
 d64 01           ; define 64 bytes (512 bits)
 ```
 
-Also any two-character hexadecimal value not associated with an instruction is a byte definition.
+Also, any two-character hexadecimal value not associated with an instruction is a byte definition.
 
 ```asm
     00
@@ -56,11 +82,11 @@ ABCD        ; hex
 
 ## Labels
 
-There are two types of labels: texts and references.
+There are two types of labels: text and reference labels.
 
 #### Text labels
 
-A text label is any word that is not a keyword or hexadecimal value.
+A text label is any word that is not a keyword or a hexadecimal value.
 
 ```asm
 a_label
@@ -70,7 +96,7 @@ a_label
 
 #### Reference labels
 
-A reference label allows forward or backward reference according to the arrow direction and amount.
+A reference label allows forward or backward references based on the direction and number of arrows.
 
 ```asm
 val_to_hex_str
@@ -80,14 +106,14 @@ val_to_hex_str
   > mov ax bx
     and al 0F
     cmp al 09
-    jle >           ; jump to "add al 30" below.
+    jle >           ; jump to "add al 30" below
     add al 07
   > add al 30
     mov [di] al
     dec di
     shr bx 04
     dec cx
-    jnz <<          ; jump to "mov ax bx" above. A single '<' would jump to "add al 30".
+    jnz <<          ; jump to "mov ax bx" above. A single '<' would jump to "add al 30"
     popa
     ret
 
@@ -104,7 +130,7 @@ Generates code in 16, 32 or 64 bits. Defaults to `@64`.
 
 ### @org
 
-Organizes offset.
+Sets the origin offset.
 
 ```asm
 @org 7C00
@@ -120,24 +146,22 @@ Aligns code or data to the specified boundary.
 
 ### @include
 
-Includes a file to assembly if its extension is `.asm`; otherwise, includes as a binary file.
+Includes an `.asm` file for assembly; otherwise, it is included as a binary file.
 
 ```asm
 @include 'example.asm'
 ```
 
-### @print
+### @dump
 
-> Or maybe @debug
-
-Prints information about a piece of code at assembly time.
+Prints information about a block of code at assembly time.
 
 ```asm
-@print
+@dump
     mov eax ebx
     add eax 01
 @end
-@print 'optimized'
+@dump
     mov eax ebx
     inc eax
 @end
@@ -148,17 +172,15 @@ The code above would print:
 ```sh
 $ zasm example.asm
 
-    size:       5 bytes
+    --- 5 bytes ---
 
-    89 D8       mov eax ebx
-    83 C0 01    add eax 01
+    00000000  89 D8       mov eax ebx
+    00000002  83 C0 01    add eax 01
 
-    --- optimized ---
+    --- 4 bytes ---
 
-    size:       4 bytes
-
-    89 D8       mov eax ebx
-    FF C0       inc eax
+    00000005  89 D8       mov eax ebx
+    00000007  FF C0       inc eax
 ```
 
 ### @define
@@ -192,7 +214,7 @@ Includes code only if the parameter is not defined.
 
 ### @guard
 
-Shorter form of `@ifndef @define @endif` that wraps the whole file.
+A shorthand for `@ifndef @define @endif` that wraps the whole file.
 
 > Maybe just make this the default behavior and @unguard to disable it.
 
@@ -244,15 +266,15 @@ Repeats data n times.
 The code above would generate:
 
 ```asm
-    sub  esp 04         ; "out" keyword reserves space for the returning value.
-    push ecx            ; "stack" keyword uses the stack.
+    sub  esp 04         ; "out" keyword reserves space for the return value
+    push ecx            ; "stack" keyword uses the stack
     call example
     add  esp 08
     mov  eax [esp-04]   ; [esp-04] is r from "out r"
     ret
 
 example 
-    push eax            ; "save" keyword prevents trashing a register.
+    push eax            ; "save" keyword prevents trashing a register
     mov  eax ebx
     add  eax [esp+04]   ; [esp+04] is v from "stack v"
     mov  [esp+08] eax   ; [esp+08] is r from "out r"
@@ -263,17 +285,16 @@ example
 | Keyword | Description |
 | --- | --- |
 | `save` | Prevents trashing a register by pushing it to the stack. |
-| `stack` | Pushes the value before calling the function. |
-| `out` | Reserves space on the stack for the returning value. If `out` uses a register the stack is not used. |
-| `v`, `r` | These are just aliases to parameters of type `stack` and `out`. Can use any name. |
+| `stack` | Pushes the value to the stack before calling the function. |
+| `out` | Reserves space on the stack for the return value. If `out` uses a register, the stack is not used. |
+| `v`, `r` | These are aliases. |
 
 ### @template
 
-Defines templated structs.
+Defines data structure templates.
 
 > A template language would allow the definition of templates like the example below.
-> Many well-known structs like GDT, IDT, etc. would be predefined making it
-> easy to setup them.
+> Many well-known structs like GDT, IDT, etc. would be predefined, making them easy to set up.
 
 ```asm
 code @template 'GDT'

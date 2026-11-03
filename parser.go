@@ -2,6 +2,7 @@ package zasm
 
 import (
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -16,19 +17,49 @@ func (p *Parser) Parse(out *Program) bool {
 
 func (p *Parser) Program(out *Program) bool {
 	var stmts []Node
+	if p.Statements(&stmts) {
+		*out = Program{Body: stmts}
+	}
+	return true
+}
+
+func (p *Parser) Statements(out *[]Node) bool {
 	var stmt Node
 	for p.VS(true) && (p.Statement(&stmt) || p.Comment()) {
 		if stmt != nil {
-			stmts = append(stmts, stmt)
+			*out = append(*out, stmt)
 			stmt = nil
 		}
 	}
-	*out = Program{Body: stmts}
 	return true
 }
 
 func (p *Parser) Statement(out *Node) bool {
-	return p.DataDef(out) || p.Label(out)
+	return p.DataDef(out) || p.Label(out) || p.Directive(out)
+}
+
+func (p *Parser) Directive(out *Node) bool {
+	return p.DirDump(out)
+}
+
+func (p *Parser) DirDump(out *Node) bool {
+	var b []Node
+	if p.Match("@dump") && p.HS(true) {
+		v := 4
+		var t Token
+		if p.RegexOut(INT, &t) {
+			v, _ = strconv.Atoi(t.Text)
+		}
+		if p.Block(&b) && p.Match("@end") {
+			*out = &DirDump{Bytes: v, Body: b}
+			return true
+		}
+	}
+	return false
+}
+
+func (p *Parser) Block(out *[]Node) bool {
+	return p.Statements(out)
 }
 
 func (p *Parser) Label(out *Node) bool {
@@ -131,3 +162,4 @@ var VSP = regexp.MustCompile(`^\s+`)
 var HSP = regexp.MustCompile(`^[ \t]+`)
 var CMT = regexp.MustCompile(`^;[^\n]*`)
 var LBL = regexp.MustCompile(`^(\w+|>)`)
+var INT = regexp.MustCompile(`^\d+`)

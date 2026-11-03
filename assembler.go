@@ -1,17 +1,20 @@
 package zasm
 
 import (
+	"bytes"
 	"io"
 	"strconv"
 )
 
-func Assemble(n Node, out io.Writer) {
+func Assemble(n Node, dmp, bin io.Writer) {
 	Visit(n, &Resolver{})
-	Visit(n, &Assembler{out})
+	Visit(n, &Assembler{bin: bin, dmp: dmp})
 }
 
 type Assembler struct {
-	out io.Writer
+	bin io.Writer
+	dmp io.Writer
+	off int
 }
 
 func (a *Assembler) VisitProgram(n *Program) {
@@ -28,6 +31,58 @@ func (a *Assembler) VisitDataDef(n *DataDef) {
 func (a *Assembler) VisitHexLiteral(n *HexLiteral) {
 	for txt := n.Token.Text; len(txt) > 0; txt = txt[2:] {
 		val, _ := strconv.ParseInt(txt[:2], 16, 64)
-		a.out.Write([]byte{byte(val)})
+		a.bin.Write([]byte{byte(val)})
+		a.off++
 	}
+}
+
+func (a *Assembler) VisitDirDump(n *DirDump) {
+	if a.dmp != nil {
+		ad := AssemblerDumper{a: a, d: DumpWriter{out: a.dmp}}
+		ad.VisitDirDump(n)
+	}
+}
+
+type AssemblerDumper struct {
+	a *Assembler
+	d DumpWriter
+}
+
+func (d *AssemblerDumper) VisitDirDump(n *DirDump) {
+	b := BytesCounter{}
+	Visit(n, &b)
+
+	siz := d.d.siz
+	d.d.SetOffset(d.a.off)
+	d.d.SetBytes(n.Bytes)
+	d.d.WriteTitle(b.count)
+	for i, nn := range n.Body {
+		Visit(nn, d)
+		if _, ok := nn.(*DirDump); ok && i != len(n.Body)-1 {
+			d.d.WriteNL()
+		}
+	}
+	d.d.SetBytes(siz)
+}
+
+func (d *AssemblerDumper) VisitProgram(n *Program) {
+	d.a.VisitProgram(n)
+}
+
+func (d *AssemblerDumper) VisitDataDef(n *DataDef) {
+	var buf bytes.Buffer
+	bin := d.a.bin
+	d.a.bin = io.MultiWriter(bin, &buf)
+	d.a.VisitDataDef(n)
+	d.a.bin = bin
+	d.d.WriteInstr(n, buf.Bytes())
+}
+
+func (d *AssemblerDumper) VisitHexLiteral(n *HexLiteral) {
+	d.a.VisitHexLiteral(n)
+}
+
+func (d *AssemblerDumper) VisitLabelDef(n *LabelDef) {
+	d.d.WriteLabel(n)
+	d.a.VisitLabelDef(n)
 }
