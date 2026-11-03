@@ -14,6 +14,7 @@ go run cmd/zasm/main.go --src the_source_code.asm --out the_output.bin
 
 - [ ] Data definition keywords
 - [x] Two-character hexadecimal value data definition
+- [x] String literal data definition
 - [x] Label definition (text and reference)
 - [x] Comments
 - [ ] Instructions

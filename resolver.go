@@ -20,6 +20,10 @@ func (r *Resolver) VisitHexLiteral(n *HexLiteral) {
 	r.offset += len(n.Token.Text) / 2
 }
 
+func (r *Resolver) VisitStringLiteral(n *StringLiteral) {
+	r.offset += len(n.Value)
+}
+
 func (r *Resolver) VisitDirDump(n *DirDump) {
 	VisitMany(n.Body, r)
 }

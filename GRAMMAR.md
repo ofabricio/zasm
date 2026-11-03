@@ -14,6 +14,8 @@ labeldef = '(\w+|>)'r
 
 hex = '[0-9A-F]+\b'r
 
+str = '".*"'r
+
 cmt = ';[^\n]*'r
 
 int = '\d+'r

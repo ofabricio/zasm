@@ -19,6 +19,11 @@ type HexLiteral struct {
 	Token Token
 }
 
+type StringLiteral struct {
+	Token Token
+	Value string
+}
+
 type DirDump struct {
 	Bytes int
 	Body  []Node

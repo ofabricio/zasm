@@ -40,6 +40,10 @@ func (u *Unparser) VisitHexLiteral(n *HexLiteral) {
 	u.write(n.Token.Text)
 }
 
+func (u *Unparser) VisitStringLiteral(n *StringLiteral) {
+	u.write(n.Token.Text)
+}
+
 func (u *Unparser) VisitLabelDef(n *LabelDef) {
 	u.write(n.Token.Text)
 }

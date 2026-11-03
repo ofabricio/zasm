@@ -15,6 +15,10 @@ Program [
         DataDef [
             Hex [0123456789ABCDEF]
         ]
+        DataDef [
+            String ["hi"]
+            Hex [00]
+        ]
         Label [a]
         DataDef [
             Hex [01]

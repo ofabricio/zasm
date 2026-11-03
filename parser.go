@@ -74,7 +74,7 @@ func (p *Parser) Label(out *Node) bool {
 func (p *Parser) DataDef(out *Node) bool {
 	var v Node
 	var vs []Node
-	for p.HS(true) && p.HexLiteral(&v) {
+	for p.HS(true) && (p.HexLiteral(&v) || p.StringLit(&v)) {
 		vs = append(vs, v)
 	}
 	if len(vs) > 0 {
@@ -99,6 +99,16 @@ func (p *Parser) RegexOut(r *regexp.Regexp, out *Token) bool {
 
 func (p *Parser) Comment() bool {
 	return p.Regex(CMT)
+}
+
+func (p *Parser) StringLit(out *Node) bool {
+	var t Token
+	if p.RegexOut(STR, &t) {
+		v, _ := strconv.Unquote(t.Text)
+		*out = &StringLiteral{t, v}
+		return true
+	}
+	return false
 }
 
 func (p *Parser) HS(opt bool) bool {
@@ -163,3 +173,4 @@ var HSP = regexp.MustCompile(`^[ \t]+`)
 var CMT = regexp.MustCompile(`^;[^\n]*`)
 var LBL = regexp.MustCompile(`^(\w+|>)`)
 var INT = regexp.MustCompile(`^\d+`)
+var STR = regexp.MustCompile(`^".*"`)

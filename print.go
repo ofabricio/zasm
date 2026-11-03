@@ -45,6 +45,10 @@ func (p *NodePrinter) VisitHexLiteral(n *HexLiteral) {
 	p.Print(fmt.Sprintf("Hex [%s]", n.Token.Text))
 }
 
+func (p *NodePrinter) VisitStringLiteral(n *StringLiteral) {
+	p.Print(fmt.Sprintf("String [%s]", n.Token.Text))
+}
+
 func (p *NodePrinter) VisitDirDump(n *DirDump) {
 	p.Print("@Dump [")
 	p.VisitMany(n.Body)

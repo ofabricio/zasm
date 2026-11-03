@@ -31,9 +31,12 @@ func (a *Assembler) VisitDataDef(n *DataDef) {
 func (a *Assembler) VisitHexLiteral(n *HexLiteral) {
 	for txt := n.Token.Text; len(txt) > 0; txt = txt[2:] {
 		val, _ := strconv.ParseInt(txt[:2], 16, 64)
-		a.bin.Write([]byte{byte(val)})
-		a.off++
+		a.write([]byte{byte(val)})
 	}
+}
+
+func (a *Assembler) VisitStringLiteral(n *StringLiteral) {
+	a.write([]byte(n.Value))
 }
 
 func (a *Assembler) VisitDirDump(n *DirDump) {
@@ -41,6 +44,11 @@ func (a *Assembler) VisitDirDump(n *DirDump) {
 		ad := AssemblerDumper{a: a, d: DumpWriter{out: a.dmp}}
 		ad.VisitDirDump(n)
 	}
+}
+
+func (a *Assembler) write(b []byte) {
+	a.bin.Write(b)
+	a.off += len(b)
 }
 
 type AssemblerDumper struct {
@@ -80,6 +88,10 @@ func (d *AssemblerDumper) VisitDataDef(n *DataDef) {
 
 func (d *AssemblerDumper) VisitHexLiteral(n *HexLiteral) {
 	d.a.VisitHexLiteral(n)
+}
+
+func (d *AssemblerDumper) VisitStringLiteral(n *StringLiteral) {
+	d.a.VisitStringLiteral(n)
 }
 
 func (d *AssemblerDumper) VisitLabelDef(n *LabelDef) {

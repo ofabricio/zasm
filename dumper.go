@@ -94,6 +94,10 @@ func (c *BytesCounter) VisitHexLiteral(n *HexLiteral) {
 	c.count += len(n.Token.Text) / 2
 }
 
+func (c *BytesCounter) VisitStringLiteral(n *StringLiteral) {
+	c.count += len(n.Value)
+}
+
 func (c *BytesCounter) VisitDirDump(n *DirDump) {
 	VisitMany(n.Body, c)
 }

@@ -6,6 +6,7 @@
         01 02                   ; 2 bytes
         01 02 03
         0123456789ABCDEF        ; 8 bytes
+        "hi" 00
 
 ; label definition
 
