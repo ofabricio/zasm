@@ -50,6 +50,10 @@ func (a *Assembler) VisitDirAST(n *DirAST) {
 	if a.dmp != nil {
 		Visit(n, &NodePrinter{out: a.dmp})
 	}
+	tmp := a.dmp
+	a.dmp = nil
+	VisitMany(n.Body, a)
+	a.dmp = tmp
 }
 
 func (a *Assembler) write(b []byte) {
