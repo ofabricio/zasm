@@ -20,7 +20,7 @@ func (d *DumpWriter) SetBytes(v int) {
 }
 
 func (d *DumpWriter) WriteTitle(n int) {
-	fmt.Fprintf(d.out, "\n    --- %d bytes ---\n\n", n)
+	fmt.Fprintf(d.out, "    --- %d bytes ---\n", n)
 }
 
 func (d *DumpWriter) WriteLabel(n *LabelDef) {
@@ -37,8 +37,7 @@ func (d *DumpWriter) WriteInstr(n Node, bin []byte) {
 		fmt.Fprintf(d.out, " %02X", b)
 		if (i+1)%d.siz == 0 {
 			if !code {
-				d.writePad(pad)
-				d.dumpCode(n)
+				d.dumpCode(n, pad)
 				code = true
 			}
 			d.WriteNL()
@@ -46,8 +45,9 @@ func (d *DumpWriter) WriteInstr(n Node, bin []byte) {
 		d.off++
 	}
 	if !code {
-		d.writePad(d.siz*3 - len(bin)*3 + pad)
-		d.dumpCode(n)
+		d.dumpCode(n, d.siz*3-len(bin)*3+pad)
+	}
+	if len(bin)%d.siz != 0 {
 		d.WriteNL()
 	}
 }
@@ -61,7 +61,8 @@ func (d *DumpWriter) dumpOffset() {
 	fmt.Fprintf(d.out, "%08X ", d.off)
 }
 
-func (d *DumpWriter) dumpCode(n Node) {
+func (d *DumpWriter) dumpCode(n Node, pad int) {
+	d.writePad(pad)
 	Unparse(n, d.out)
 }
 

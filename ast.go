@@ -32,3 +32,8 @@ type DirDump struct {
 type DirAST struct {
 	Body []Node
 }
+
+func NodeIs[T any](n Node) bool {
+	_, ok := n.(T)
+	return ok
+}

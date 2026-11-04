@@ -64,22 +64,22 @@ type AssemblerDumper struct {
 
 func (d *AssemblerDumper) VisitDirDump(n *DirDump) {
 
-	if len(n.Body) == 0 {
-		return
-	}
-
 	b := BytesCounter{}
-	Visit(n, &b)
+	VisitMany(n.Body, &b)
 
 	siz := d.d.siz
 	d.d.SetOffset(d.a.off)
 	d.d.SetBytes(n.Bytes)
+	d.d.WriteNL()
 	d.d.WriteTitle(b.count)
 	for i, nn := range n.Body {
-		Visit(nn, d)
-		if _, ok := nn.(*DirDump); ok && i != len(n.Body)-1 {
-			d.d.WriteNL()
+		if i == 0 && !NodeIs[*DirDump](nn) {
+			d.d.WriteNL() // Add a NL when first node is not a @dump.
 		}
+		if i >= 1 && !NodeIs[*DirDump](nn) && NodeIs[*DirDump](n.Body[i-1]) {
+			d.d.WriteNL() // Add a NL when exiting a @dump and the current node is not a @dump.
+		}
+		Visit(nn, d)
 	}
 	d.d.SetBytes(siz)
 }

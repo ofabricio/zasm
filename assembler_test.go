@@ -22,6 +22,22 @@ func TestDirAST(t *testing.T) {
 	assert(t, true, oks, "")
 	assert(t, string(dmpf), dmp.String(), "")
 }
+
+func TestDirDump(t *testing.T) {
+
+	srcf, dmpf := SplitFile("testdata/@dump.test")
+
+	var prg Program
+	var oks = Parse(srcf, &prg)
+
+	var bin bytes.Buffer
+	var dmp bytes.Buffer
+	Assemble(&prg, &dmp, &bin)
+
+	assert(t, true, oks, "")
+	assert(t, string(dmpf), dmp.String(), "")
+}
+
 func TestAssemble(t *testing.T) {
 
 	srcf, _ := os.ReadFile("testdata/source.asm")
