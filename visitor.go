@@ -7,6 +7,7 @@ type Visitor interface {
 	VisitHexLiteral(*HexLiteral)
 	VisitStringLiteral(*StringLiteral)
 	VisitDirDump(*DirDump)
+	VisitDirAST(*DirAST)
 }
 
 func Visit(n Node, v Visitor) {
@@ -23,6 +24,8 @@ func Visit(n Node, v Visitor) {
 		v.VisitStringLiteral(n)
 	case *DirDump:
 		v.VisitDirDump(n)
+	case *DirAST:
+		v.VisitDirAST(n)
 	}
 }
 

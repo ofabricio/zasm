@@ -27,3 +27,7 @@ func (r *Resolver) VisitStringLiteral(n *StringLiteral) {
 func (r *Resolver) VisitDirDump(n *DirDump) {
 	VisitMany(n.Body, r)
 }
+
+func (r *Resolver) VisitDirAST(n *DirAST) {
+	VisitMany(n.Body, r)
+}

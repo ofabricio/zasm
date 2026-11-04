@@ -1,0 +1,18 @@
+@ast
+    00
+    @ast
+        01
+    @end
+@end
+
+----------
+@ast [
+    DataDef [
+        Hex [00]
+    ]
+    @ast [
+        DataDef [
+            Hex [01]
+        ]
+    ]
+]

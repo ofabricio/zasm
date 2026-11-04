@@ -39,7 +39,7 @@ func (p *Parser) Statement(out *Node) bool {
 }
 
 func (p *Parser) Directive(out *Node) bool {
-	return p.DirDump(out)
+	return p.DirDump(out) || p.DirAST(out)
 }
 
 func (p *Parser) DirDump(out *Node) bool {
@@ -52,6 +52,17 @@ func (p *Parser) DirDump(out *Node) bool {
 		}
 		if p.Block(&b) && p.Match("@end") {
 			*out = &DirDump{Bytes: v, Body: b}
+			return true
+		}
+	}
+	return false
+}
+
+func (p *Parser) DirAST(out *Node) bool {
+	var b []Node
+	if p.Match("@ast") {
+		if p.Block(&b) && p.Match("@end") {
+			*out = &DirAST{Body: b}
 			return true
 		}
 	}

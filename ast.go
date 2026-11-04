@@ -28,3 +28,7 @@ type DirDump struct {
 	Bytes int
 	Body  []Node
 }
+
+type DirAST struct {
+	Body []Node
+}

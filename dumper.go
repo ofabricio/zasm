@@ -101,3 +101,7 @@ func (c *BytesCounter) VisitStringLiteral(n *StringLiteral) {
 func (c *BytesCounter) VisitDirDump(n *DirDump) {
 	VisitMany(n.Body, c)
 }
+
+func (c *BytesCounter) VisitDirAST(n *DirAST) {
+	VisitMany(n.Body, c)
+}

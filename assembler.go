@@ -46,6 +46,12 @@ func (a *Assembler) VisitDirDump(n *DirDump) {
 	}
 }
 
+func (a *Assembler) VisitDirAST(n *DirAST) {
+	if a.dmp != nil {
+		Visit(n, &NodePrinter{out: a.dmp})
+	}
+}
+
 func (a *Assembler) write(b []byte) {
 	a.bin.Write(b)
 	a.off += len(b)
@@ -57,6 +63,11 @@ type AssemblerDumper struct {
 }
 
 func (d *AssemblerDumper) VisitDirDump(n *DirDump) {
+
+	if len(n.Body) == 0 {
+		return
+	}
+
 	b := BytesCounter{}
 	Visit(n, &b)
 
@@ -97,4 +108,8 @@ func (d *AssemblerDumper) VisitStringLiteral(n *StringLiteral) {
 func (d *AssemblerDumper) VisitLabelDef(n *LabelDef) {
 	d.d.WriteLabel(n)
 	d.a.VisitLabelDef(n)
+}
+
+func (d *AssemblerDumper) VisitDirAST(n *DirAST) {
+	d.a.VisitDirAST(n)
 }

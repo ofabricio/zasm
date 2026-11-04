@@ -32,10 +32,6 @@ func (u *Unparser) VisitDataDef(n *DataDef) {
 	}
 }
 
-func (u *Unparser) VisitDirDump(n *DirDump) {
-	VisitMany(n.Body, u)
-}
-
 func (u *Unparser) VisitHexLiteral(n *HexLiteral) {
 	u.write(n.Token.Text)
 }
@@ -46,4 +42,12 @@ func (u *Unparser) VisitStringLiteral(n *StringLiteral) {
 
 func (u *Unparser) VisitLabelDef(n *LabelDef) {
 	u.write(n.Token.Text)
+}
+
+func (u *Unparser) VisitDirDump(n *DirDump) {
+	VisitMany(n.Body, u)
+}
+
+func (u *Unparser) VisitDirAST(n *DirAST) {
+	VisitMany(n.Body, u)
 }

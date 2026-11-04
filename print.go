@@ -54,3 +54,9 @@ func (p *NodePrinter) VisitDirDump(n *DirDump) {
 	p.VisitMany(n.Body)
 	p.Print("]")
 }
+
+func (p *NodePrinter) VisitDirAST(n *DirAST) {
+	p.Print("@ast [")
+	p.VisitMany(n.Body)
+	p.Print("]")
+}
