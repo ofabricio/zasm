@@ -4,9 +4,10 @@ stmts = ( stmt | cmt )*
 
 stmt = datadef | labeldef | directive
 
-directive = dirdump
+directive = dirdump | dirast
 
 dirdump = '@dump' int? stmts '@end'
+dirast  = '@ast' stmts '@end'
 
 datadef = hex
 
