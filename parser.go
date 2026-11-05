@@ -150,7 +150,7 @@ func (p *Parser) Out(m Marker, cond bool, out *Token) bool {
 }
 
 func (p *Parser) Expect(v string) bool {
-	return p.Match(v) || p.MessageAt(p.Marker, "expected"+v)
+	return p.Match(v) || p.MessageAt(p.Marker, "expected "+v)
 }
 
 func (p *Parser) Message(msg string) bool {
