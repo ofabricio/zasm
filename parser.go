@@ -47,7 +47,7 @@ func (p *Parser) Directive(out *Node) bool {
 func (p *Parser) DirDump(out *Node) bool {
 	if m := p.Mark(); p.Match("@dump") && p.HS(true) {
 		if p.dmp {
-			return p.MessageAt(m, "@ast cannot be nested")
+			return p.MessageAt(m, "@dump cannot be nested")
 		}
 		v := 4
 		var t Token

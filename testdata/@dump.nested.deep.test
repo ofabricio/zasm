@@ -1,0 +1,12 @@
+@ast
+    @dump
+        00
+        @dump
+            01
+        @end
+    @end
+@end
+---------- SPLIT ----------
+---------- SPLIT ----------
+---------- SPLIT ----------
+failed to parse: line 4 char 9: @dump cannot be nested

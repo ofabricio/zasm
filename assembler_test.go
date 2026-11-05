@@ -16,6 +16,8 @@ func TestAll(t *testing.T) {
 		"testdata/@ast.nested.test",
 		"testdata/@ast.nested.deep.test",
 		"testdata/@dump.test",
+		"testdata/@dump.nested.test",
+		"testdata/@dump.nested.deep.test",
 		"testdata/@dump@ast.test",
 	}
 
