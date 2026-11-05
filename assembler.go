@@ -100,5 +100,6 @@ func (d *DumperDecorator) VisitLabelDef(n *LabelDef) {
 }
 
 func (d *DumperDecorator) VisitDirAST(n *DirAST) {
+	VisitMany(n.Body, d)
 	d.a.VisitDirAST(n)
 }
