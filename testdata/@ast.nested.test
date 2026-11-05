@@ -1,0 +1,10 @@
+@ast
+    00
+    @ast
+        01
+    @end
+@end
+---------- SPLIT ----------
+---------- SPLIT ----------
+---------- SPLIT ----------
+failed to parse: line 3 char 5: @ast cannot be nested

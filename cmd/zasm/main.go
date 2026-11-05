@@ -24,9 +24,8 @@ func main() {
 	}
 
 	var prg zasm.Program
-	var oks = zasm.Parse(string(data), &prg)
 
-	if !oks {
+	if err := zasm.Parse(string(data), &prg); err != nil {
 		panic("failed to parse source code")
 	}
 

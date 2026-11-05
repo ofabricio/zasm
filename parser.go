@@ -1,18 +1,20 @@
 package zasm
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
 )
 
-func Parse(src string, out *Program) bool {
-	p := Parser{src: src}
+func Parse(src string, out *Program) error {
+	p := Parser{src: src, Line: 1, Col: 1}
 	return p.Parse(out)
 }
 
-func (p *Parser) Parse(out *Program) bool {
-	return p.Program(out)
+func (p *Parser) Parse(out *Program) error {
+	p.Program(out)
+	return p.err
 }
 
 func (p *Parser) Program(out *Program) bool {
@@ -43,28 +45,38 @@ func (p *Parser) Directive(out *Node) bool {
 }
 
 func (p *Parser) DirDump(out *Node) bool {
-	var b []Node
-	if p.Match("@dump") && p.HS(true) {
+	if m := p.Mark(); p.Match("@dump") && p.HS(true) {
+		if p.dmp {
+			return p.MessageAt(m, "@ast cannot be nested")
+		}
 		v := 4
 		var t Token
 		if p.RegexOut(INT, &t) {
 			v, _ = strconv.Atoi(t.Text)
 		}
-		if p.Block(&b) && p.Match("@end") {
+		p.dmp = true
+		var b []Node
+		if p.Block(&b) {
 			*out = &DirDump{Bytes: v, Body: b}
-			return true
 		}
+		p.dmp = false
+		return p.Expect("@end")
 	}
 	return false
 }
 
 func (p *Parser) DirAST(out *Node) bool {
-	var b []Node
-	if p.Match("@ast") {
-		if p.Block(&b) && p.Match("@end") {
-			*out = &DirAST{Body: b}
-			return true
+	if m := p.Mark(); p.Match("@ast") {
+		if p.ast {
+			return p.MessageAt(m, "@ast cannot be nested")
 		}
+		p.ast = true
+		var b []Node
+		if p.Block(&b) {
+			*out = &DirAST{Body: b}
+		}
+		p.ast = false
+		return p.Expect("@end")
 	}
 	return false
 }
@@ -137,6 +149,21 @@ func (p *Parser) Out(m Marker, cond bool, out *Token) bool {
 	return cond
 }
 
+func (p *Parser) Expect(v string) bool {
+	return p.Match(v) || p.MessageAt(p.Marker, "expected"+v)
+}
+
+func (p *Parser) Message(msg string) bool {
+	return p.MessageAt(p.Marker, msg)
+}
+
+func (p *Parser) MessageAt(m Marker, msg string) bool {
+	if p.err == nil {
+		p.err = &Error{m, msg}
+	}
+	return false
+}
+
 func (p *Parser) Match(v string) bool {
 	return strings.HasPrefix(p.Tail(), v) && p.Advance(v)
 }
@@ -147,7 +174,18 @@ func (p *Parser) Regex(r *regexp.Regexp) bool {
 
 func (p *Parser) Advance(v string) bool {
 	p.Pos += len(v)
+	p.lncol(v)
 	return len(v) > 0
+}
+
+func (p *Parser) lncol(v string) {
+	for _, r := range v {
+		p.Col++
+		if r == '\n' {
+			p.Line++
+			p.Col = 1
+		}
+	}
 }
 
 func (p *Parser) Tail() string {
@@ -165,6 +203,10 @@ func (p *Parser) Token(m Marker) Token {
 type Parser struct {
 	Marker
 	src string
+	err error
+
+	ast bool
+	dmp bool
 }
 
 type Token struct {
@@ -185,3 +227,12 @@ var CMT = regexp.MustCompile(`^;[^\n]*`)
 var LBL = regexp.MustCompile(`^(\w+|>)`)
 var INT = regexp.MustCompile(`^\d+`)
 var STR = regexp.MustCompile(`^".*"`)
+
+type Error struct {
+	Marker
+	Msg string
+}
+
+func (e *Error) Error() string {
+	return fmt.Sprintf("failed to parse: line %d char %d: %s", e.Line, e.Col, e.Msg)
+}

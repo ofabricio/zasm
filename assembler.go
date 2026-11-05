@@ -40,20 +40,12 @@ func (a *Assembler) VisitStringLiteral(n *StringLiteral) {
 }
 
 func (a *Assembler) VisitDirDump(n *DirDump) {
-	if a.dmp != nil {
-		ad := AssemblerDumper{a: a, d: DumpWriter{out: a.dmp}}
-		ad.VisitDirDump(n)
-	}
+	Visit(n, &DumperDecorator{a: a, d: DumpWriter{out: a.dmp}})
 }
 
 func (a *Assembler) VisitDirAST(n *DirAST) {
-	if a.dmp != nil {
-		Visit(n, &NodePrinter{out: a.dmp})
-	}
-	tmp := a.dmp
-	a.dmp = nil
+	Visit(n, &NodePrinter{out: a.dmp})
 	VisitMany(n.Body, a)
-	a.dmp = tmp
 }
 
 func (a *Assembler) write(b []byte) {
@@ -61,12 +53,12 @@ func (a *Assembler) write(b []byte) {
 	a.off += len(b)
 }
 
-type AssemblerDumper struct {
+type DumperDecorator struct {
 	a *Assembler
 	d DumpWriter
 }
 
-func (d *AssemblerDumper) VisitDirDump(n *DirDump) {
+func (d *DumperDecorator) VisitDirDump(n *DirDump) {
 
 	b := BytesCounter{}
 	VisitMany(n.Body, &b)
@@ -76,23 +68,16 @@ func (d *AssemblerDumper) VisitDirDump(n *DirDump) {
 	d.d.SetBytes(n.Bytes)
 	d.d.WriteNL()
 	d.d.WriteTitle(b.count)
-	for i, nn := range n.Body {
-		if i == 0 && !NodeIs[*DirDump](nn) {
-			d.d.WriteNL() // Add a NL when first node is not a @dump.
-		}
-		if i >= 1 && !NodeIs[*DirDump](nn) && NodeIs[*DirDump](n.Body[i-1]) {
-			d.d.WriteNL() // Add a NL when exiting a @dump and the current node is not a @dump.
-		}
-		Visit(nn, d)
-	}
+	d.d.WriteNL()
+	VisitMany(n.Body, d)
 	d.d.SetBytes(siz)
 }
 
-func (d *AssemblerDumper) VisitProgram(n *Program) {
+func (d *DumperDecorator) VisitProgram(n *Program) {
 	d.a.VisitProgram(n)
 }
 
-func (d *AssemblerDumper) VisitDataDef(n *DataDef) {
+func (d *DumperDecorator) VisitDataDef(n *DataDef) {
 	var buf bytes.Buffer
 	bin := d.a.bin
 	d.a.bin = io.MultiWriter(bin, &buf)
@@ -101,19 +86,19 @@ func (d *AssemblerDumper) VisitDataDef(n *DataDef) {
 	d.d.WriteInstr(n, buf.Bytes())
 }
 
-func (d *AssemblerDumper) VisitHexLiteral(n *HexLiteral) {
+func (d *DumperDecorator) VisitHexLiteral(n *HexLiteral) {
 	d.a.VisitHexLiteral(n)
 }
 
-func (d *AssemblerDumper) VisitStringLiteral(n *StringLiteral) {
+func (d *DumperDecorator) VisitStringLiteral(n *StringLiteral) {
 	d.a.VisitStringLiteral(n)
 }
 
-func (d *AssemblerDumper) VisitLabelDef(n *LabelDef) {
+func (d *DumperDecorator) VisitLabelDef(n *LabelDef) {
 	d.d.WriteLabel(n)
 	d.a.VisitLabelDef(n)
 }
 
-func (d *AssemblerDumper) VisitDirAST(n *DirAST) {
+func (d *DumperDecorator) VisitDirAST(n *DirAST) {
 	d.a.VisitDirAST(n)
 }

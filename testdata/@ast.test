@@ -1,20 +1,29 @@
 @ast
     00
-    @ast
-        01
-    @end
+    01
 @end
-
+@ast
+    02
+    03
+@end
 ---------- SPLIT ----------
 @ast [
     DataDef [
         Hex [00]
     ]
-    @ast [
-        DataDef [
-            Hex [01]
-        ]
+    DataDef [
+        Hex [01]
+    ]
+]
+@ast [
+    DataDef [
+        Hex [02]
+    ]
+    DataDef [
+        Hex [03]
     ]
 ]
 ---------- SPLIT ----------
-0001
+00010203
+---------- SPLIT ----------
+<nil>

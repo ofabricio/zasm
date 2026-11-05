@@ -20,8 +20,8 @@ func ExampleDumpWriter() {
 	`
 
 	var prg Program
-	oks := Parse(src, &prg)
-	fmt.Println(oks)
+	err := Parse(src, &prg)
+	fmt.Println(err)
 
 	lb := prg.Body[0].(*DirDump).Body[0].(*LabelDef)
 	i0 := prg.Body[0].(*DirDump).Body[1].(*DataDef)
@@ -45,7 +45,7 @@ func ExampleDumpWriter() {
 	d.WriteInstr(i4, []byte{0xFF, 0xC0})
 
 	// Output:
-	// true
+	// <nil>
 	//     abc
 	//     00000000  90             90
 	//     00000001  89 D8          89 D8
