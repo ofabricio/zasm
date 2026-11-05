@@ -50,7 +50,7 @@ func (p *NodePrinter) VisitStringLiteral(n *StringLiteral) {
 }
 
 func (p *NodePrinter) VisitDirDump(n *DirDump) {
-	p.Print("@Dump [")
+	p.Print("@dump [")
 	p.VisitMany(n.Body)
 	p.Print("]")
 }
